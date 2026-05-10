@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../domain/entities/profile.dart';
+import '../cubit/profile_cubit.dart';
+import '../cubit/profile_state.dart';
 import '../widgets/about_section.dart';
 import '../widgets/contact_section.dart';
 import '../widgets/experience_section.dart';
@@ -29,10 +33,10 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   @override
   void initState() {
     super.initState();
-    _scrollController = ScrollController()
-      ..addListener(() {
-        setState(() => _scrollOffset = _scrollController.offset);
-      });
+    _scrollController =
+        ScrollController()..addListener(() {
+          setState(() => _scrollOffset = _scrollController.offset);
+        });
   }
 
   @override
@@ -55,6 +59,48 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
 
   @override
   Widget build(BuildContext context) {
+    return BlocBuilder<ProfileCubit, ProfileState>(
+      builder: (context, state) {
+        return switch (state) {
+          ProfileLoading() || ProfileInitial() => const _LoadingView(),
+          ProfileError(:final message) => _ErrorView(
+            message: message,
+            onRetry: () => context.read<ProfileCubit>().fetchProfile(),
+          ),
+          ProfileLoaded(:final profile) => _PortfolioContent(
+            profile: profile,
+            scrollController: _scrollController,
+            scrollOffset: _scrollOffset,
+            sectionKeys: _sectionKeys,
+            onScrollToSection: _scrollToSection,
+          ),
+        };
+      },
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Full portfolio layout (shown when profile is loaded)
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _PortfolioContent extends StatelessWidget {
+  const _PortfolioContent({
+    required this.profile,
+    required this.scrollController,
+    required this.scrollOffset,
+    required this.sectionKeys,
+    required this.onScrollToSection,
+  });
+
+  final Profile profile;
+  final ScrollController scrollController;
+  final double scrollOffset;
+  final List<GlobalKey> sectionKeys;
+  final void Function(int) onScrollToSection;
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Stack(
@@ -63,61 +109,63 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           const _BackgroundDecoration(),
           // Scrollable content
           CustomScrollView(
-            controller: _scrollController,
+            controller: scrollController,
             slivers: [
               // Top padding for navbar
-              const SliverToBoxAdapter(
-                child: SizedBox(height: 72),
-              ),
+              const SliverToBoxAdapter(child: SizedBox(height: 72)),
               // Hero
               SliverToBoxAdapter(
                 child: Center(
                   child: HeroSection(
-                    onViewProjects: () => _scrollToSection(2),
-                    onContactMe: () => _scrollToSection(4),
+                    profile: profile,
+                    onViewProjects: () => onScrollToSection(2),
+                    onContactMe: () => onScrollToSection(4),
                   ),
                 ),
               ),
               // About
               SliverToBoxAdapter(
                 child: _SectionWrapper(
-                  key: _sectionKeys[0],
+                  key: sectionKeys[0],
                   child: const AboutSection(),
                 ),
               ),
               // Skills
               SliverToBoxAdapter(
                 child: _SectionWrapper(
-                  key: _sectionKeys[1],
+                  key: sectionKeys[1],
                   child: const SkillsSection(),
                 ),
               ),
               // Projects
               SliverToBoxAdapter(
                 child: _SectionWrapper(
-                  key: _sectionKeys[2],
+                  key: sectionKeys[2],
                   child: const ProjectsSection(),
                 ),
               ),
               // Experience
               SliverToBoxAdapter(
                 child: _SectionWrapper(
-                  key: _sectionKeys[3],
+                  key: sectionKeys[3],
                   child: const ExperienceSection(),
                 ),
               ),
               // Contact
               SliverToBoxAdapter(
                 child: _SectionWrapper(
-                  key: _sectionKeys[4],
-                  child: const ContactSection(),
+                  key: sectionKeys[4],
+                  child: ContactSection(profile: profile),
                 ),
               ),
               // Footer
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.only(top: 40),
-                  child: FooterSection(onNavItemTap: _scrollToSection),
+                  child: FooterSection(
+                    profile: profile,
+                    onNavItemTap: onScrollToSection,
+                  ),
                 ),
               ),
             ],
@@ -129,22 +177,23 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
             right: 0,
             child: Center(
               child: NavBar(
-                onNavItemTap: _scrollToSection,
-                scrollOffset: _scrollOffset,
+                onNavItemTap: onScrollToSection,
+                scrollOffset: scrollOffset,
               ),
             ),
           ),
           // Floating back-to-top button
-          if (_scrollOffset > 400)
+          if (scrollOffset > 400)
             Positioned(
               bottom: 32,
               right: 32,
               child: _BackToTopButton(
-                onTap: () => _scrollController.animateTo(
-                  0,
-                  duration: const Duration(milliseconds: 600),
-                  curve: Curves.easeInOut,
-                ),
+                onTap:
+                    () => scrollController.animateTo(
+                      0,
+                      duration: const Duration(milliseconds: 600),
+                      curve: Curves.easeInOut,
+                    ),
               ),
             ),
         ],
@@ -152,6 +201,76 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     );
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Loading / Error views
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _LoadingView extends StatelessWidget {
+  const _LoadingView();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      backgroundColor: AppColors.background,
+      body: Center(child: CircularProgressIndicator(color: AppColors.primary)),
+    );
+  }
+}
+
+class _ErrorView extends StatelessWidget {
+  const _ErrorView({required this.message, required this.onRetry});
+
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.wifi_off_rounded,
+                color: AppColors.onSurfaceVariant,
+                size: 48,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Failed to load profile',
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(color: AppColors.onSurface),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                message,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: AppColors.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 24),
+              FilledButton.icon(
+                onPressed: onRetry,
+                icon: const Icon(Icons.refresh_rounded),
+                label: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Shared helpers
+// ─────────────────────────────────────────────────────────────────────────────
 
 class _SectionWrapper extends StatelessWidget {
   const _SectionWrapper({super.key, required this.child});
@@ -210,9 +329,7 @@ class _BackgroundDecoration extends StatelessWidget {
           ),
         ),
         // Dot grid pattern overlay
-        Positioned.fill(
-          child: CustomPaint(painter: _DotGridPainter()),
-        ),
+        Positioned.fill(child: CustomPaint(painter: _DotGridPainter())),
       ],
     );
   }
@@ -221,9 +338,10 @@ class _BackgroundDecoration extends StatelessWidget {
 class _DotGridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.03)
-      ..style = PaintingStyle.fill;
+    final paint =
+        Paint()
+          ..color = Colors.white.withValues(alpha: 0.03)
+          ..style = PaintingStyle.fill;
 
     const spacing = 40.0;
     for (double x = 0; x < size.width; x += spacing) {

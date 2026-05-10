@@ -4,11 +4,13 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../domain/entities/profile.dart';
 
 /// Footer with copyright, nav links, and social icons.
 class FooterSection extends StatelessWidget {
-  const FooterSection({super.key, this.onNavItemTap});
+  const FooterSection({super.key, required this.profile, this.onNavItemTap});
 
+  final Profile profile;
   final void Function(int index)? onNavItemTap;
 
   @override
@@ -38,20 +40,20 @@ class FooterSection extends StatelessWidget {
             child: isMobile
                 ? Column(
                     children: [
-                      _Logo(),
+                      _Logo(name: profile.name),
                       const SizedBox(height: 20),
                       _NavLinks(onNavItemTap: onNavItemTap),
                       const SizedBox(height: 20),
-                      _SocialIcons(),
+                      _SocialIcons(profile: profile),
                     ],
                   )
                 : Row(
                     children: [
-                      _Logo(),
+                      _Logo(name: profile.name),
                       const Spacer(),
                       _NavLinks(onNavItemTap: onNavItemTap),
                       const Spacer(),
-                      _SocialIcons(),
+                      _SocialIcons(profile: profile),
                     ],
                   ),
           ),
@@ -62,7 +64,7 @@ class FooterSection extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           Text(
-            '© ${DateTime.now().year} ${AppConstants.name}. Built with Flutter.',
+            '© ${DateTime.now().year} ${profile.name}. Built with Flutter.',
             style: AppTextStyles.labelSmall.copyWith(
               color: AppColors.onSurfaceVariant.withValues(alpha: 0.6),
             ),
@@ -74,6 +76,10 @@ class FooterSection extends StatelessWidget {
 }
 
 class _Logo extends StatelessWidget {
+  const _Logo({required this.name});
+
+  final String name;
+
   @override
   Widget build(BuildContext context) {
     return ShaderMask(
@@ -82,7 +88,7 @@ class _Logo extends StatelessWidget {
         Rect.fromLTWH(0, 0, bounds.width, bounds.height),
       ),
       child: Text(
-        AppConstants.name,
+        name,
         style: AppTextStyles.headlineMedium.copyWith(
           fontWeight: FontWeight.w700,
         ),
@@ -117,6 +123,10 @@ class _NavLinks extends StatelessWidget {
 }
 
 class _SocialIcons extends StatelessWidget {
+  const _SocialIcons({required this.profile});
+
+  final Profile profile;
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -124,17 +134,17 @@ class _SocialIcons extends StatelessWidget {
       children: [
         _SocialButton(
           icon: Icons.code_rounded,
-          url: AppConstants.githubUrl,
+          url: profile.githubUrl,
         ),
         const SizedBox(width: 12),
         _SocialButton(
           icon: Icons.person_outline_rounded,
-          url: AppConstants.linkedinUrl,
+          url: profile.linkedinUrl,
         ),
         const SizedBox(width: 12),
         _SocialButton(
           icon: Icons.email_outlined,
-          url: 'mailto:${AppConstants.email}',
+          url: 'mailto:${profile.email}',
         ),
       ],
     );

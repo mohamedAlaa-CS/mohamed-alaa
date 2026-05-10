@@ -8,16 +8,19 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/gradient_button.dart';
 import '../../../../core/widgets/gradient_text.dart';
 import '../../../../core/widgets/outlined_button_widget.dart';
+import '../../domain/entities/profile.dart';
 
 /// Hero section – two-column layout with gradient heading,
 /// bio, CTA buttons, and animated abstract illustration.
 class HeroSection extends StatefulWidget {
   const HeroSection({
     super.key,
+    required this.profile,
     this.onViewProjects,
     this.onContactMe,
   });
 
+  final Profile profile;
   final VoidCallback? onViewProjects;
   final VoidCallback? onContactMe;
 
@@ -72,6 +75,7 @@ class _HeroSectionState extends State<HeroSection>
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Expanded(child: _HeroContent(
+                      profile: widget.profile,
                       onViewProjects: widget.onViewProjects,
                       onContactMe: widget.onContactMe,
                     )),
@@ -82,6 +86,7 @@ class _HeroSectionState extends State<HeroSection>
               : Column(
                   children: [
                     _HeroContent(
+                      profile: widget.profile,
                       onViewProjects: widget.onViewProjects,
                       onContactMe: widget.onContactMe,
                       isMobile: true,
@@ -101,11 +106,13 @@ class _HeroSectionState extends State<HeroSection>
 
 class _HeroContent extends StatelessWidget {
   const _HeroContent({
+    required this.profile,
     this.onViewProjects,
     this.onContactMe,
     this.isMobile = false,
   });
 
+  final Profile profile;
   final VoidCallback? onViewProjects;
   final VoidCallback? onContactMe;
   final bool isMobile;
@@ -137,7 +144,7 @@ class _HeroContent extends StatelessWidget {
         const SizedBox(height: 24),
         // Name
         GradientText(
-          "Hi, I'm\n${AppConstants.name}",
+          "Hi, I'm\n${profile.name}",
           style: AppTextStyles.displayLarge.copyWith(
             fontSize: isMobile ? 40 : 64,
           ),
@@ -158,7 +165,7 @@ class _HeroContent extends StatelessWidget {
             ),
             const SizedBox(width: 12),
             Text(
-              AppConstants.role,
+              profile.role,
               style: AppTextStyles.headlineMedium.copyWith(
                 color: AppColors.primaryCyan,
                 fontWeight: FontWeight.w500,
@@ -169,7 +176,7 @@ class _HeroContent extends StatelessWidget {
         const SizedBox(height: 24),
         // Bio
         Text(
-          AppConstants.bio,
+          profile.bio,
           style: AppTextStyles.bodyLarge,
           textAlign: isMobile ? TextAlign.center : TextAlign.start,
         ),

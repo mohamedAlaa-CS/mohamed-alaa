@@ -1,17 +1,9 @@
 import 'package:flutter/material.dart';
 
-/// All static portfolio content lives here – no hardcoded strings in widgets.
+/// Static portfolio content — layout, nav, skills, projects, experience.
+/// Personal-info fields (name, role, bio, email, links) are fetched dynamically
+/// from Supabase via [ProfileCubit].
 abstract final class AppConstants {
-  // ── Personal Info ──────────────────────────────────────────────
-  static const String name = 'Mohamed Alaa';
-  static const String role = 'Flutter Developer';
-  static const String bio =
-      'Flutter developer with 1+ year experience building scalable mobile '
-      'applications using clean architecture, Cubit, Firebase, APIs, offline '
-      'support, payment systems, and real-time features.';
-  static const String email = 'mohamedAlaa@gmail.com';
-  static const String githubUrl = 'https://github.com/mohamedAlaa-CS';
-  static const String linkedinUrl = 'https://linkedin.com/in/mohamedAlaa';
 
   // ── Navigation ─────────────────────────────────────────────────
   static const List<String> navItems = [

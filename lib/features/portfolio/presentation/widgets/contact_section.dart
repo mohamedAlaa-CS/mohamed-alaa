@@ -7,10 +7,13 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/glass_card.dart';
 import '../../../../core/widgets/gradient_button.dart';
 import '../../../../core/widgets/section_heading.dart';
+import '../../domain/entities/profile.dart';
 
 /// Contact section with info cards and a message form.
 class ContactSection extends StatelessWidget {
-  const ContactSection({super.key});
+  const ContactSection({super.key, required this.profile});
+
+  final Profile profile;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +34,7 @@ class ContactSection extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(child: _ContactInfo()),
+                Expanded(child: _ContactInfo(profile: profile)),
                 const SizedBox(width: 48),
                 Expanded(child: _ContactForm()),
               ],
@@ -39,7 +42,7 @@ class ContactSection extends StatelessWidget {
           else
             Column(
               children: [
-                _ContactInfo(),
+                _ContactInfo(profile: profile),
                 const SizedBox(height: 32),
                 _ContactForm(),
               ],
@@ -51,6 +54,10 @@ class ContactSection extends StatelessWidget {
 }
 
 class _ContactInfo extends StatelessWidget {
+  const _ContactInfo({required this.profile});
+
+  final Profile profile;
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -70,22 +77,22 @@ class _ContactInfo extends StatelessWidget {
         _ContactTile(
           icon: Icons.email_outlined,
           label: 'Email',
-          value: AppConstants.email,
-          onTap: () => _launch('mailto:${AppConstants.email}'),
+          value: profile.email,
+          onTap: () => _launch('mailto:${profile.email}'),
         ),
         const SizedBox(height: 16),
         _ContactTile(
           icon: Icons.code_rounded,
           label: 'GitHub',
-          value: 'mohamedAlaa-CS',
-          onTap: () => _launch(AppConstants.githubUrl),
+          value: profile.githubUrl,
+          onTap: () => _launch(profile.githubUrl),
         ),
         const SizedBox(height: 16),
         _ContactTile(
           icon: Icons.person_outlined,
           label: 'LinkedIn',
-          value: 'Mohamed Alaa',
-          onTap: () => _launch(AppConstants.linkedinUrl),
+          value: profile.name,
+          onTap: () => _launch(profile.linkedinUrl),
         ),
       ],
     );
