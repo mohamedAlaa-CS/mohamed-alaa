@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/di/injection_container.dart' as di;
 import 'core/theme/app_theme.dart';
+import 'features/portfolio/presentation/cubit/about_cubit.dart';
 import 'features/portfolio/presentation/cubit/profile_cubit.dart';
 import 'features/portfolio/presentation/screens/portfolio_screen.dart';
 
@@ -22,8 +23,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<ProfileCubit>(
-      create: (_) => di.sl<ProfileCubit>()..fetchProfile(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<ProfileCubit>(
+          create: (_) => di.sl<ProfileCubit>()..fetchProfile(),
+        ),
+        BlocProvider<AboutCubit>(
+          create: (_) => di.sl<AboutCubit>()..fetchAboutInfo(),
+        ),
+      ],
       child: MaterialApp(
         title: 'Mohamed Alaa - Flutter Developer',
         debugShowCheckedModeBanner: false,

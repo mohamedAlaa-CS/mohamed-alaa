@@ -14,14 +14,6 @@ abstract final class AppConstants {
     'Contact',
   ];
 
-  // ── About Stats ────────────────────────────────────────────────
-  static const List<({String value, String label, IconData icon})> stats = [
-    (value: '10+', label: 'Projects', icon: Icons.folder_outlined),
-    (value: '1+', label: 'Years Exp', icon: Icons.timeline_outlined),
-    (value: '15+', label: 'Technologies', icon: Icons.code_outlined),
-    (value: '5+', label: 'Clients', icon: Icons.people_outlined),
-  ];
-
   // ── Skills ─────────────────────────────────────────────────────
   static const List<({String name, IconData icon, double level})> skills = [
     (name: 'Flutter', icon: Icons.flutter_dash, level: 0.9),

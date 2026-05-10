@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/glass_card.dart';
 import '../../../../core/widgets/section_heading.dart';
+import '../../domain/entities/about_info.dart';
+import '../cubit/about_cubit.dart';
+import '../cubit/about_state.dart';
 
 /// About Me section with bio text and animated statistic cards.
 class AboutSection extends StatelessWidget {
@@ -15,6 +19,64 @@ class AboutSection extends StatelessWidget {
     final width = MediaQuery.sizeOf(context).width;
     final isDesktop = width >= AppConstants.tabletBreakpoint;
 
+    return BlocBuilder<AboutCubit, AboutState>(
+      builder: (context, state) {
+        return switch (state) {
+          AboutLoading() || AboutInitial() => const Center(
+              child: Padding(
+                padding: EdgeInsets.all(48),
+                child: CircularProgressIndicator(color: AppColors.primary),
+              ),
+            ),
+          AboutError(:final message) => Center(
+              child: Padding(
+                padding: const EdgeInsets.all(48),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.error_outline,
+                      color: AppColors.onSurfaceVariant,
+                      size: 36,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      message,
+                      style: AppTextStyles.bodyLarge,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    FilledButton.icon(
+                      onPressed: () =>
+                          context.read<AboutCubit>().fetchAboutInfo(),
+                      icon: const Icon(Icons.refresh_rounded),
+                      label: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          AboutLoaded(:final aboutInfo) => _AboutContent(
+              aboutInfo: aboutInfo,
+              isDesktop: isDesktop,
+            ),
+        };
+      },
+    );
+  }
+}
+
+class _AboutContent extends StatelessWidget {
+  const _AboutContent({
+    required this.aboutInfo,
+    required this.isDesktop,
+  });
+
+  final AboutInfo aboutInfo;
+  final bool isDesktop;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       constraints: const BoxConstraints(maxWidth: AppConstants.maxContentWidth),
       padding: EdgeInsets.symmetric(horizontal: isDesktop ? 40 : 24),
@@ -29,17 +91,17 @@ class AboutSection extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(child: _AboutText()),
+                Expanded(child: _AboutText(aboutInfo: aboutInfo)),
                 const SizedBox(width: 48),
-                Expanded(child: _StatsGrid(isDesktop: true)),
+                Expanded(child: _StatsGrid(aboutInfo: aboutInfo, isDesktop: true)),
               ],
             )
           else
             Column(
               children: [
-                _AboutText(),
+                _AboutText(aboutInfo: aboutInfo),
                 const SizedBox(height: 32),
-                _StatsGrid(isDesktop: false),
+                _StatsGrid(aboutInfo: aboutInfo, isDesktop: false),
               ],
             ),
         ],
@@ -49,60 +111,58 @@ class AboutSection extends StatelessWidget {
 }
 
 class _AboutText extends StatelessWidget {
+  const _AboutText({required this.aboutInfo});
+
+  final AboutInfo aboutInfo;
+
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "I'm a passionate Flutter developer focused on building beautiful, "
-          "performant, and scalable mobile applications.",
+          aboutInfo.title,
           style: AppTextStyles.headlineMedium.copyWith(
             color: AppColors.onSurface,
           ),
         ),
         const SizedBox(height: 20),
         Text(
-          'With a strong foundation in clean architecture and modern state '
-          'management patterns, I specialize in creating cross-platform '
-          'applications that deliver exceptional user experiences.',
+          aboutInfo.description1,
           style: AppTextStyles.bodyLarge,
         ),
         const SizedBox(height: 16),
         Text(
-          'My expertise spans across Firebase integration, REST API '
-          'consumption, real-time features, offline-first development, '
-          'payment gateway integration, and responsive design principles.',
+          aboutInfo.description2,
           style: AppTextStyles.bodyLarge,
         ),
         const SizedBox(height: 24),
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children:
-              ['Flutter', 'Dart', 'Firebase', 'Clean Arch', 'Cubit/BLoC']
-                  .map(
-                    (tech) => Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 7,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryCyan.withValues(alpha: 0.08),
-                        borderRadius: BorderRadius.circular(100),
-                        border: Border.all(
-                          color: AppColors.primaryCyan.withValues(alpha: 0.15),
-                        ),
-                      ),
-                      child: Text(
-                        tech,
-                        style: AppTextStyles.labelSmall.copyWith(
-                          color: AppColors.primaryCyan,
-                        ),
-                      ),
+          children: aboutInfo.technologies
+              .map(
+                (tech) => Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 7,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryCyan.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(100),
+                    border: Border.all(
+                      color: AppColors.primaryCyan.withValues(alpha: 0.15),
                     ),
-                  )
-                  .toList(),
+                  ),
+                  child: Text(
+                    tech,
+                    style: AppTextStyles.labelSmall.copyWith(
+                      color: AppColors.primaryCyan,
+                    ),
+                  ),
+                ),
+              )
+              .toList(),
         ),
       ],
     );
@@ -110,11 +170,36 @@ class _AboutText extends StatelessWidget {
 }
 
 class _StatsGrid extends StatelessWidget {
-  const _StatsGrid({required this.isDesktop});
+  const _StatsGrid({required this.aboutInfo, required this.isDesktop});
+
+  final AboutInfo aboutInfo;
   final bool isDesktop;
 
   @override
   Widget build(BuildContext context) {
+    final stats = [
+      (
+        value: '${aboutInfo.projectsCount}+',
+        label: 'Projects',
+        icon: Icons.folder_outlined,
+      ),
+      (
+        value: '${aboutInfo.experienceYears}+',
+        label: 'Years Exp',
+        icon: Icons.timeline_outlined,
+      ),
+      (
+        value: '${aboutInfo.technologiesCount}+',
+        label: 'Technologies',
+        icon: Icons.code_outlined,
+      ),
+      (
+        value: '${aboutInfo.clientsCount}+',
+        label: 'Clients',
+        icon: Icons.people_outlined,
+      ),
+    ];
+
     return GridView.count(
       crossAxisCount: 2,
       shrinkWrap: true,
@@ -122,12 +207,11 @@ class _StatsGrid extends StatelessWidget {
       mainAxisSpacing: 16,
       crossAxisSpacing: 16,
       childAspectRatio: isDesktop ? 1.3 : 1.5,
-      children:
-          AppConstants.stats
-              .map(
-                (s) => _StatCard(value: s.value, label: s.label, icon: s.icon),
-              )
-              .toList(),
+      children: stats
+          .map(
+            (s) => _StatCard(value: s.value, label: s.label, icon: s.icon),
+          )
+          .toList(),
     );
   }
 }
