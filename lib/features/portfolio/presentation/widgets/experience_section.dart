@@ -76,9 +76,12 @@ class _ExperienceContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    final isMobile = width < AppConstants.tabletBreakpoint;
+
     return Container(
       constraints: const BoxConstraints(maxWidth: AppConstants.maxContentWidth),
-      padding: EdgeInsets.symmetric(horizontal: isDesktop ? 40 : 24),
+      padding: EdgeInsets.symmetric(horizontal: isDesktop ? 40 : (isMobile ? 20 : 32)),
       child: Column(
         children: [
           const SectionHeading(
@@ -86,12 +89,21 @@ class _ExperienceContent extends StatelessWidget {
             subtitle: 'My professional journey',
           ),
           const SizedBox(height: 48),
-          ...List.generate(experiences.length, (index) {
-            return _TimelineEntry(
-              experience: experiences[index],
-              isLast: index == experiences.length - 1,
-            );
-          }),
+          // Constrain the timeline width on large screens for readability
+          Center(
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 900),
+              child: Column(
+                children: List.generate(experiences.length, (index) {
+                  return _TimelineEntry(
+                    experience: experiences[index],
+                    isLast: index == experiences.length - 1,
+                    isMobile: isMobile,
+                  );
+                }),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -99,9 +111,14 @@ class _ExperienceContent extends StatelessWidget {
 }
 
 class _TimelineEntry extends StatefulWidget {
-  const _TimelineEntry({required this.experience, required this.isLast});
+  const _TimelineEntry({
+    required this.experience,
+    required this.isLast,
+    required this.isMobile,
+  });
   final Experience experience;
   final bool isLast;
+  final bool isMobile;
 
   @override
   State<_TimelineEntry> createState() => _TimelineEntryState();
@@ -109,24 +126,50 @@ class _TimelineEntry extends StatefulWidget {
 
 class _TimelineEntryState extends State<_TimelineEntry> {
   bool _isHovered = false;
+  bool _isExpanded = false;
 
   @override
   Widget build(BuildContext context) {
     final exp = widget.experience;
+    final hasHighlights = exp.highlights.isNotEmpty;
+    // We show the "Read More" button if there are highlights or if the description is long enough to likely wrap.
+    final needsReadMore = hasHighlights || exp.description.length > 120;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
-      child: IntrinsicHeight(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Timeline line + dot
-            SizedBox(
-              width: 40,
-              child: Column(
-                children: [
-                  AnimatedContainer(
+      child: Stack(
+        children: [
+          // Timeline line (drawn behind the content)
+          if (!widget.isLast)
+            Positioned(
+              left: widget.isMobile ? 13 : 19, // Centers the 2px line within the 28px or 40px column
+              top: 16, // Start exactly under the dot
+              bottom: 0,
+              child: Container(
+                width: 2,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      AppColors.primaryPurple.withValues(alpha: 0.4),
+                      AppColors.primaryPurple.withValues(alpha: 0.1),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          // Main layout
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Dot column
+              SizedBox(
+                width: widget.isMobile ? 28 : 40,
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: AnimatedContainer(
                     duration: const Duration(milliseconds: 250),
                     width: 16,
                     height: 16,
@@ -147,32 +190,15 @@ class _TimelineEntryState extends State<_TimelineEntry> {
                           : [],
                     ),
                   ),
-                  if (!widget.isLast)
-                    Expanded(
-                      child: Container(
-                        width: 2,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              AppColors.primaryPurple.withValues(alpha: 0.4),
-                              AppColors.primaryPurple.withValues(alpha: 0.1),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
+                ),
               ),
-            ),
-            const SizedBox(width: 16),
+            SizedBox(width: widget.isMobile ? 12 : 16),
             // Content card
             Expanded(
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 250),
-                margin: const EdgeInsets.only(bottom: 32),
-                padding: const EdgeInsets.all(24),
+                margin: EdgeInsets.only(bottom: widget.isMobile ? 24 : 32),
+                padding: EdgeInsets.all(widget.isMobile ? 16 : 24),
                 decoration: BoxDecoration(
                   color: AppColors.cardBackground,
                   borderRadius: BorderRadius.circular(12),
@@ -212,39 +238,90 @@ class _TimelineEntryState extends State<_TimelineEntry> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    Text(exp.description, style: AppTextStyles.bodyMedium),
-                    const SizedBox(height: 16),
-                    // Highlights
-                    ...exp.highlights.map(
-                      (h) => Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              margin: const EdgeInsets.only(top: 6),
-                              width: 6,
-                              height: 6,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                gradient: AppColors.primaryGradient,
+                    AnimatedSize(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                      alignment: Alignment.topCenter,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            exp.description,
+                            style: AppTextStyles.bodyMedium,
+                            maxLines: _isExpanded ? null : 2,
+                            overflow: _isExpanded ? null : TextOverflow.ellipsis,
+                          ),
+                          if (_isExpanded && hasHighlights) ...[
+                            const SizedBox(height: 16),
+                            // Highlights
+                            ...exp.highlights.map(
+                              (h) => Padding(
+                                padding: const EdgeInsets.only(bottom: 8),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      margin: const EdgeInsets.only(top: 6),
+                                      width: 6,
+                                      height: 6,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        gradient: AppColors.primaryGradient,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: Text(h, style: AppTextStyles.bodyMedium),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child:
-                                  Text(h, style: AppTextStyles.bodyMedium),
-                            ),
                           ],
-                        ),
+                        ],
                       ),
                     ),
+                    if (needsReadMore) ...[
+                      const SizedBox(height: 12),
+                      MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _isExpanded = !_isExpanded;
+                            });
+                          },
+                          behavior: HitTestBehavior.opaque,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                _isExpanded ? 'Read Less' : 'Read More',
+                                style: AppTextStyles.labelSmall.copyWith(
+                                  color: AppColors.primaryCyan,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Icon(
+                                _isExpanded
+                                    ? Icons.keyboard_arrow_up_rounded
+                                    : Icons.keyboard_arrow_down_rounded,
+                                color: AppColors.primaryCyan,
+                                size: 18,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
             ),
           ],
         ),
+        ],
       ),
     );
   }

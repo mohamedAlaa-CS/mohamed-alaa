@@ -10,7 +10,7 @@ import '../../../../core/widgets/gradient_text.dart';
 import '../../../../core/widgets/outlined_button_widget.dart';
 import '../../domain/entities/profile.dart';
 
-/// Hero section – two-column layout with gradient heading,
+/// Hero section – responsive layout with gradient heading,
 /// bio, CTA buttons, and animated abstract illustration.
 class HeroSection extends StatefulWidget {
   const HeroSection({
@@ -58,13 +58,13 @@ class _HeroSectionState extends State<HeroSection>
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    final isDesktop = width >= AppConstants.tabletBreakpoint;
+    final isDesktop = width >= AppConstants.desktopBreakpoint;
+    final isTablet = width >= AppConstants.tabletBreakpoint;
 
     return Container(
-      //constraints: const BoxConstraints(maxWidth: AppConstants.maxContentWidth),
       padding: EdgeInsets.symmetric(
-        horizontal: isDesktop ? 40 : 24,
-        vertical: isDesktop ? 80 : 60,
+        horizontal: isTablet ? 40 : 24,
+        vertical: isDesktop ? 80 : (isTablet ? 60 : 48),
       ),
       child: FadeTransition(
         opacity: _fadeIn,
@@ -74,57 +74,93 @@ class _HeroSectionState extends State<HeroSection>
               ? Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Expanded(child: _HeroContent(
-                      profile: widget.profile,
-                      onViewProjects: widget.onViewProjects,
-                      onContactMe: widget.onContactMe,
-                    )),
+                    Expanded(
+                      child: _HeroContent(
+                        profile: widget.profile,
+                        onViewProjects: widget.onViewProjects,
+                        onContactMe: widget.onContactMe,
+                        layoutMode: _LayoutMode.desktop,
+                      ),
+                    ),
                     const SizedBox(width: 60),
                     Expanded(child: _HeroIllustration()),
                   ],
                 )
-              : Column(
-                  children: [
-                    _HeroContent(
-                      profile: widget.profile,
-                      onViewProjects: widget.onViewProjects,
-                      onContactMe: widget.onContactMe,
-                      isMobile: true,
+              : isTablet
+                  ? Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          flex: 3,
+                          child: _HeroContent(
+                            profile: widget.profile,
+                            onViewProjects: widget.onViewProjects,
+                            onContactMe: widget.onContactMe,
+                            layoutMode: _LayoutMode.tablet,
+                          ),
+                        ),
+                        const SizedBox(width: 32),
+                        Expanded(
+                          flex: 2,
+                          child: SizedBox(
+                            height: 300,
+                            child: _HeroIllustration(),
+                          ),
+                        ),
+                      ],
+                    )
+                  : Column(
+                      children: [
+                        _HeroContent(
+                          profile: widget.profile,
+                          onViewProjects: widget.onViewProjects,
+                          onContactMe: widget.onContactMe,
+                          layoutMode: _LayoutMode.mobile,
+                        ),
+                        const SizedBox(height: 40),
+                        SizedBox(
+                          height: 260,
+                          child: _HeroIllustration(),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 48),
-                    SizedBox(
-                      height: 280,
-                      child: _HeroIllustration(),
-                    ),
-                  ],
-                ),
         ),
       ),
     );
   }
 }
 
+enum _LayoutMode { mobile, tablet, desktop }
+
 class _HeroContent extends StatelessWidget {
   const _HeroContent({
     required this.profile,
     this.onViewProjects,
     this.onContactMe,
-    this.isMobile = false,
+    required this.layoutMode,
   });
 
   final Profile profile;
   final VoidCallback? onViewProjects;
   final VoidCallback? onContactMe;
-  final bool isMobile;
+  final _LayoutMode layoutMode;
+
+  bool get _isMobile => layoutMode == _LayoutMode.mobile;
+
+  double get _titleFontSize => switch (layoutMode) {
+        _LayoutMode.desktop => 64,
+        _LayoutMode.tablet => 48,
+        _LayoutMode.mobile => 36,
+      };
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment:
-          isMobile ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+          _isMobile ? CrossAxisAlignment.center : CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Greeting
+        // Greeting pill
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
@@ -138,6 +174,7 @@ class _HeroContent extends StatelessWidget {
             '👋 Welcome to my portfolio',
             style: AppTextStyles.labelLarge.copyWith(
               color: AppColors.primary,
+              fontSize: _isMobile ? 12 : 14,
             ),
           ),
         ),
@@ -146,9 +183,9 @@ class _HeroContent extends StatelessWidget {
         GradientText(
           "Hi, I'm\n${profile.name}",
           style: AppTextStyles.displayLarge.copyWith(
-            fontSize: isMobile ? 40 : 64,
+            fontSize: _titleFontSize,
           ),
-          textAlign: isMobile ? TextAlign.center : TextAlign.start,
+          textAlign: _isMobile ? TextAlign.center : TextAlign.start,
         ),
         const SizedBox(height: 12),
         // Role
@@ -164,11 +201,14 @@ class _HeroContent extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-            Text(
-              profile.role,
-              style: AppTextStyles.headlineMedium.copyWith(
-                color: AppColors.primaryCyan,
-                fontWeight: FontWeight.w500,
+            Flexible(
+              child: Text(
+                profile.role,
+                style: AppTextStyles.headlineMedium.copyWith(
+                  color: AppColors.primaryCyan,
+                  fontWeight: FontWeight.w500,
+                  fontSize: _isMobile ? 16 : 20,
+                ),
               ),
             ),
           ],
@@ -178,14 +218,14 @@ class _HeroContent extends StatelessWidget {
         Text(
           profile.bio,
           style: AppTextStyles.bodyLarge,
-          textAlign: isMobile ? TextAlign.center : TextAlign.start,
+          textAlign: _isMobile ? TextAlign.center : TextAlign.start,
         ),
         const SizedBox(height: 36),
         // CTA Buttons
         Wrap(
           spacing: 16,
           runSpacing: 12,
-          alignment: isMobile ? WrapAlignment.center : WrapAlignment.start,
+          alignment: _isMobile ? WrapAlignment.center : WrapAlignment.start,
           children: [
             GradientButton(
               text: 'View Projects',
@@ -239,80 +279,81 @@ class _HeroIllustrationState extends State<_HeroIllustration>
           height: 400,
           child: Stack(
             alignment: Alignment.center,
-          children: [
-            // Glowing purple circle
-            Positioned(
-              top: 20 + math.sin(value * math.pi * 2) * 15,
-              right: 30,
-              child: Container(
-                width: 180,
-                height: 180,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    colors: [
-                      AppColors.primaryPurple.withValues(alpha: 0.3),
-                      AppColors.primaryPurple.withValues(alpha: 0.0),
-                    ],
+            children: [
+              // Glowing purple circle
+              Positioned(
+                top: 20 + math.sin(value * math.pi * 2) * 15,
+                right: 30,
+                child: Container(
+                  width: 180,
+                  height: 180,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [
+                        AppColors.primaryPurple.withValues(alpha: 0.3),
+                        AppColors.primaryPurple.withValues(alpha: 0.0),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            // Glowing cyan circle
-            Positioned(
-              bottom: 40 + math.cos(value * math.pi * 2) * 12,
-              left: 20,
-              child: Container(
-                width: 140,
-                height: 140,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    colors: [
-                      AppColors.primaryCyan.withValues(alpha: 0.25),
-                      AppColors.primaryCyan.withValues(alpha: 0.0),
-                    ],
+              // Glowing cyan circle
+              Positioned(
+                bottom: 40 + math.cos(value * math.pi * 2) * 12,
+                left: 20,
+                child: Container(
+                  width: 140,
+                  height: 140,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [
+                        AppColors.primaryCyan.withValues(alpha: 0.25),
+                        AppColors.primaryCyan.withValues(alpha: 0.0),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            // Center code block card
-            Positioned(
-              top: 40 + math.sin(value * math.pi * 2) * 8,
-              child: _FloatingCodeCard(),
-            ),
-            // Flutter icon
-            Positioned(
-              top: 10 + math.cos(value * math.pi * 2 + 1) * 10,
-              left: 40,
-              child: _FloatingIcon(
-                icon: Icons.flutter_dash,
-                color: AppColors.primaryCyan,
-                size: 40,
+              // Center code block card
+              Positioned(
+                top: 40 + math.sin(value * math.pi * 2) * 8,
+                child: _FloatingCodeCard(),
               ),
-            ),
-            // Dart icon
-            Positioned(
-              bottom: 30 + math.sin(value * math.pi * 2 + 2) * 12,
-              right: 30,
-              child: _FloatingIcon(
-                icon: Icons.code_rounded,
-                color: AppColors.primaryPurple,
-                size: 36,
+              // Flutter icon
+              Positioned(
+                top: 10 + math.cos(value * math.pi * 2 + 1) * 10,
+                left: 40,
+                child: _FloatingIcon(
+                  icon: Icons.flutter_dash,
+                  color: AppColors.primaryCyan,
+                  size: 40,
+                ),
               ),
-            ),
-            // Firebase icon
-            Positioned(
-              top: 80 + math.cos(value * math.pi * 2 + 3) * 8,
-              right: 10,
-              child: _FloatingIcon(
-                icon: Icons.local_fire_department_rounded,
-                color: AppColors.tertiary,
-                size: 32,
+              // Dart icon
+              Positioned(
+                bottom: 30 + math.sin(value * math.pi * 2 + 2) * 12,
+                right: 30,
+                child: _FloatingIcon(
+                  icon: Icons.code_rounded,
+                  color: AppColors.primaryPurple,
+                  size: 36,
+                ),
               ),
-            ),
-          ],
-        ));
+              // Firebase icon
+              Positioned(
+                top: 80 + math.cos(value * math.pi * 2 + 3) * 8,
+                right: 10,
+                child: _FloatingIcon(
+                  icon: Icons.local_fire_department_rounded,
+                  color: AppColors.tertiary,
+                  size: 32,
+                ),
+              ),
+            ],
+          ),
+        );
       },
     );
   }

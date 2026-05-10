@@ -17,49 +17,48 @@ class AboutSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    final isDesktop = width >= AppConstants.tabletBreakpoint;
 
     return BlocBuilder<AboutCubit, AboutState>(
       builder: (context, state) {
         return switch (state) {
           AboutLoading() || AboutInitial() => const Center(
-              child: Padding(
-                padding: EdgeInsets.all(48),
-                child: CircularProgressIndicator(color: AppColors.primary),
-              ),
+            child: Padding(
+              padding: EdgeInsets.all(48),
+              child: CircularProgressIndicator(color: AppColors.primary),
             ),
+          ),
           AboutError(:final message) => Center(
-              child: Padding(
-                padding: const EdgeInsets.all(48),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.error_outline,
-                      color: AppColors.onSurfaceVariant,
-                      size: 36,
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      message,
-                      style: AppTextStyles.bodyLarge,
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 16),
-                    FilledButton.icon(
-                      onPressed: () =>
-                          context.read<AboutCubit>().fetchAboutInfo(),
-                      icon: const Icon(Icons.refresh_rounded),
-                      label: const Text('Retry'),
-                    ),
-                  ],
-                ),
+            child: Padding(
+              padding: const EdgeInsets.all(48),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.error_outline,
+                    color: AppColors.onSurfaceVariant,
+                    size: 36,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    message,
+                    style: AppTextStyles.bodyLarge,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  FilledButton.icon(
+                    onPressed:
+                        () => context.read<AboutCubit>().fetchAboutInfo(),
+                    icon: const Icon(Icons.refresh_rounded),
+                    label: const Text('Retry'),
+                  ),
+                ],
               ),
             ),
+          ),
           AboutLoaded(:final aboutInfo) => _AboutContent(
-              aboutInfo: aboutInfo,
-              isDesktop: isDesktop,
-            ),
+            aboutInfo: aboutInfo,
+            screenWidth: width,
+          ),
         };
       },
     );
@@ -67,19 +66,19 @@ class AboutSection extends StatelessWidget {
 }
 
 class _AboutContent extends StatelessWidget {
-  const _AboutContent({
-    required this.aboutInfo,
-    required this.isDesktop,
-  });
+  const _AboutContent({required this.aboutInfo, required this.screenWidth});
 
   final AboutInfo aboutInfo;
-  final bool isDesktop;
+  final double screenWidth;
+
+  bool get _isDesktop => screenWidth >= AppConstants.desktopBreakpoint;
+  bool get _isTablet => screenWidth >= AppConstants.tabletBreakpoint;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       constraints: const BoxConstraints(maxWidth: AppConstants.maxContentWidth),
-      padding: EdgeInsets.symmetric(horizontal: isDesktop ? 40 : 24),
+      padding: EdgeInsets.symmetric(horizontal: _isTablet ? 40 : 24),
       child: Column(
         children: [
           const SectionHeading(
@@ -87,21 +86,50 @@ class _AboutContent extends StatelessWidget {
             subtitle: 'Get to know me and my journey',
           ),
           const SizedBox(height: 48),
-          if (isDesktop)
+          if (_isDesktop)
+            // Desktop: side-by-side
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(child: _AboutText(aboutInfo: aboutInfo)),
                 const SizedBox(width: 48),
-                Expanded(child: _StatsGrid(aboutInfo: aboutInfo, isDesktop: true)),
+                Expanded(
+                  child: _StatsGrid(
+                    aboutInfo: aboutInfo,
+                    crossAxisCount: 2,
+                  ),
+                ),
+              ],
+            )
+          else if (_isTablet)
+            // Tablet: side-by-side with tighter ratio
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: _AboutText(aboutInfo: aboutInfo),
+                ),
+                const SizedBox(width: 32),
+                Expanded(
+                  flex: 2,
+                  child: _StatsGrid(
+                    aboutInfo: aboutInfo,
+                    crossAxisCount: 2,
+                  ),
+                ),
               ],
             )
           else
+            // Mobile: stacked
             Column(
               children: [
                 _AboutText(aboutInfo: aboutInfo),
                 const SizedBox(height: 32),
-                _StatsGrid(aboutInfo: aboutInfo, isDesktop: false),
+                _StatsGrid(
+                  aboutInfo: aboutInfo,
+                  crossAxisCount: 2,
+                ),
               ],
             ),
         ],
@@ -110,10 +138,17 @@ class _AboutContent extends StatelessWidget {
   }
 }
 
-class _AboutText extends StatelessWidget {
+class _AboutText extends StatefulWidget {
   const _AboutText({required this.aboutInfo});
 
   final AboutInfo aboutInfo;
+
+  @override
+  State<_AboutText> createState() => _AboutTextState();
+}
+
+class _AboutTextState extends State<_AboutText> {
+  bool _isExpanded = false;
 
   @override
   Widget build(BuildContext context) {
@@ -121,26 +156,65 @@ class _AboutText extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          aboutInfo.title,
+          widget.aboutInfo.title,
           style: AppTextStyles.headlineMedium.copyWith(
             color: AppColors.onSurface,
           ),
         ),
         const SizedBox(height: 20),
-        Text(
-          aboutInfo.description1,
-          style: AppTextStyles.bodyLarge,
+        AnimatedSize(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          alignment: Alignment.topCenter,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                widget.aboutInfo.description1,
+                style: AppTextStyles.bodyLarge,
+                maxLines: _isExpanded ? null : 4,
+                overflow: _isExpanded ? null : TextOverflow.ellipsis,
+              ),
+              if (_isExpanded) ...[
+                const SizedBox(height: 16),
+                Text(widget.aboutInfo.description2, style: AppTextStyles.bodyLarge),
+              ],
+            ],
+          ),
         ),
         const SizedBox(height: 16),
-        Text(
-          aboutInfo.description2,
-          style: AppTextStyles.bodyLarge,
+        MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: GestureDetector(
+            onTap: () => setState(() => _isExpanded = !_isExpanded),
+            behavior: HitTestBehavior.opaque,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  _isExpanded ? 'Read Less' : 'Read More',
+                  style: AppTextStyles.labelSmall.copyWith(
+                    color: AppColors.primaryCyan,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Icon(
+                  _isExpanded
+                      ? Icons.keyboard_arrow_up_rounded
+                      : Icons.keyboard_arrow_down_rounded,
+                  color: AppColors.primaryCyan,
+                  size: 18,
+                ),
+              ],
+            ),
+          ),
         ),
         const SizedBox(height: 24),
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: aboutInfo.technologies
+          children: widget.aboutInfo.technologies
               .map(
                 (tech) => Container(
                   padding: const EdgeInsets.symmetric(
@@ -168,12 +242,14 @@ class _AboutText extends StatelessWidget {
     );
   }
 }
-
 class _StatsGrid extends StatelessWidget {
-  const _StatsGrid({required this.aboutInfo, required this.isDesktop});
+  const _StatsGrid({
+    required this.aboutInfo,
+    required this.crossAxisCount,
+  });
 
   final AboutInfo aboutInfo;
-  final bool isDesktop;
+  final int crossAxisCount;
 
   @override
   Widget build(BuildContext context) {
@@ -200,18 +276,27 @@ class _StatsGrid extends StatelessWidget {
       ),
     ];
 
-    return GridView.count(
-      crossAxisCount: 2,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: 16,
-      crossAxisSpacing: 16,
-      childAspectRatio: isDesktop ? 1.3 : 1.5,
-      children: stats
-          .map(
-            (s) => _StatCard(value: s.value, label: s.label, icon: s.icon),
-          )
-          .toList(),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const double gap = 16;
+        final availableWidth = constraints.maxWidth;
+        // On very small screens, fallback to 1 column to avoid overflow
+        final int cols = availableWidth < 250 ? 1 : crossAxisCount;
+        final cardWidth = (availableWidth - (gap * (cols - 1))) / cols;
+
+        return Wrap(
+          spacing: gap,
+          runSpacing: gap,
+          children: stats
+              .map(
+                (s) => SizedBox(
+                  width: cardWidth,
+                  child: _StatCard(value: s.value, label: s.label, icon: s.icon),
+                ),
+              )
+              .toList(),
+        );
+      },
     );
   }
 }
@@ -244,8 +329,10 @@ class _StatCardState extends State<_StatCard> {
         child: GlassCard(
           borderColor: _isHovered ? AppColors.primaryPurple : null,
           borderOpacity: _isHovered ? 0.3 : 0.1,
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Container(
                 padding: const EdgeInsets.all(10),
@@ -260,14 +347,15 @@ class _StatCardState extends State<_StatCard> {
                 ),
               ),
               const SizedBox(height: 12),
-              Expanded(
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(widget.value, style: AppTextStyles.headlineLarge),
-                ),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(widget.value, style: AppTextStyles.headlineLarge),
               ),
               const SizedBox(height: 4),
-              Text(widget.label, style: AppTextStyles.labelSmall),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(widget.label, style: AppTextStyles.labelSmall),
+              ),
             ],
           ),
         ),

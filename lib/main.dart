@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:device_preview/device_preview.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/di/injection_container.dart' as di;
@@ -18,7 +20,12 @@ void main() async {
     anonKey: 'sb_publishable_WXCdvBXgxVd2J3J_DGIZpQ_OR3edHHi',
   );
   await di.init();
-  runApp(const MyApp());
+  runApp(
+    DevicePreview(
+      enabled: false,
+      builder: (context) => const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -48,6 +55,8 @@ class MyApp extends StatelessWidget {
         title: 'Mohamed Alaa - Flutter Developer',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.darkTheme,
+        locale: DevicePreview.locale(context),
+        builder: DevicePreview.appBuilder,
         home: const PortfolioScreen(),
       ),
     );

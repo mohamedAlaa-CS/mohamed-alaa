@@ -21,11 +21,12 @@ class ContactSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    final isDesktop = width >= AppConstants.tabletBreakpoint;
+    final isDesktop = width >= AppConstants.desktopBreakpoint;
+    final isTablet = width >= AppConstants.tabletBreakpoint;
 
     return Container(
       constraints: const BoxConstraints(maxWidth: AppConstants.maxContentWidth),
-      padding: EdgeInsets.symmetric(horizontal: isDesktop ? 40 : 24),
+      padding: EdgeInsets.symmetric(horizontal: isTablet ? 40 : 24),
       child: Column(
         children: [
           const SectionHeading(
@@ -40,6 +41,18 @@ class ContactSection extends StatelessWidget {
                 Expanded(child: _ContactInfo(profile: profile)),
                 const SizedBox(width: 48),
                 const Expanded(child: _ContactForm()),
+              ],
+            )
+          else if (isTablet)
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: _ContactInfo(profile: profile),
+                ),
+                const SizedBox(width: 32),
+                const Expanded(flex: 3, child: _ContactForm()),
               ],
             )
           else
@@ -155,18 +168,21 @@ class _ContactTileState extends State<_ContactTile> {
                 ),
               ),
               const SizedBox(width: 16),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(widget.label, style: AppTextStyles.labelSmall),
-                  const SizedBox(height: 2),
-                  Text(
-                    widget.value,
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.onSurface,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(widget.label, style: AppTextStyles.labelSmall),
+                    const SizedBox(height: 2),
+                    Text(
+                      widget.value,
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.onSurface,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),
