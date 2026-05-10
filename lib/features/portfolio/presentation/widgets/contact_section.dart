@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/constants/app_constants.dart';
@@ -8,6 +9,8 @@ import '../../../../core/widgets/glass_card.dart';
 import '../../../../core/widgets/gradient_button.dart';
 import '../../../../core/widgets/section_heading.dart';
 import '../../domain/entities/profile.dart';
+import '../cubit/contact_cubit.dart';
+import '../cubit/contact_state.dart';
 
 /// Contact section with info cards and a message form.
 class ContactSection extends StatelessWidget {
@@ -36,7 +39,7 @@ class ContactSection extends StatelessWidget {
               children: [
                 Expanded(child: _ContactInfo(profile: profile)),
                 const SizedBox(width: 48),
-                Expanded(child: _ContactForm()),
+                const Expanded(child: _ContactForm()),
               ],
             )
           else
@@ -44,7 +47,7 @@ class ContactSection extends StatelessWidget {
               children: [
                 _ContactInfo(profile: profile),
                 const SizedBox(height: 32),
-                _ContactForm(),
+                const _ContactForm(),
               ],
             ),
         ],
@@ -173,55 +176,176 @@ class _ContactTileState extends State<_ContactTile> {
   }
 }
 
-class _ContactForm extends StatelessWidget {
+class _ContactForm extends StatefulWidget {
+  const _ContactForm();
+
+  @override
+  State<_ContactForm> createState() => _ContactFormState();
+}
+
+class _ContactFormState extends State<_ContactForm> {
+  final _formKey = GlobalKey<FormState>();
+  late final TextEditingController _nameController;
+  late final TextEditingController _emailController;
+  late final TextEditingController _messageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController();
+    _emailController = TextEditingController();
+    _messageController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _messageController.dispose();
+    super.dispose();
+  }
+
+  void _onSend() {
+    if (!_formKey.currentState!.validate()) return;
+
+    context.read<ContactCubit>().send(
+          name: _nameController.text.trim(),
+          email: _emailController.text.trim(),
+          message: _messageController.text.trim(),
+        );
+  }
+
+  void _clearForm() {
+    _nameController.clear();
+    _emailController.clear();
+    _messageController.clear();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return GlassCard(
-      padding: const EdgeInsets.all(28),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text('Send a Message', style: AppTextStyles.headlineMedium),
-          const SizedBox(height: 24),
-          const TextField(
-            decoration: InputDecoration(
-              labelText: 'Your Name',
-              labelStyle: TextStyle(color: AppColors.onSurfaceVariant),
-              prefixIcon: Icon(Icons.person_outline, size: 20),
-            ),
-            style: TextStyle(color: AppColors.onSurface),
-          ),
-          const SizedBox(height: 16),
-          const TextField(
-            decoration: InputDecoration(
-              labelText: 'Your Email',
-              labelStyle: TextStyle(color: AppColors.onSurfaceVariant),
-              prefixIcon: Icon(Icons.email_outlined, size: 20),
-            ),
-            style: TextStyle(color: AppColors.onSurface),
-          ),
-          const SizedBox(height: 16),
-          const TextField(
-            maxLines: 4,
-            decoration: InputDecoration(
-              labelText: 'Your Message',
-              labelStyle: TextStyle(color: AppColors.onSurfaceVariant),
-              alignLabelWithHint: true,
-              prefixIcon: Padding(
-                padding: EdgeInsets.only(bottom: 60),
-                child: Icon(Icons.message_outlined, size: 20),
+    return BlocConsumer<ContactCubit, ContactState>(
+      listener: (context, state) {
+        switch (state) {
+          case ContactSuccess():
+            _clearForm();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text('Message sent successfully! 🎉'),
+                backgroundColor: Colors.green.shade700,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
+            );
+            context.read<ContactCubit>().reset();
+          case ContactError(:final message):
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Failed to send: $message'),
+                backgroundColor: Colors.red.shade700,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            );
+            context.read<ContactCubit>().reset();
+          default:
+            break;
+        }
+      },
+      builder: (context, state) {
+        final isSending = state is ContactSending;
+
+        return GlassCard(
+          padding: const EdgeInsets.all(28),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text('Send a Message', style: AppTextStyles.headlineMedium),
+                const SizedBox(height: 24),
+                TextFormField(
+                  controller: _nameController,
+                  enabled: !isSending,
+                  decoration: const InputDecoration(
+                    labelText: 'Your Name',
+                    labelStyle: TextStyle(color: AppColors.onSurfaceVariant),
+                    prefixIcon: Icon(Icons.person_outline, size: 20),
+                  ),
+                  style: const TextStyle(color: AppColors.onSurface),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Please enter your name';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _emailController,
+                  enabled: !isSending,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: const InputDecoration(
+                    labelText: 'Your Email',
+                    labelStyle: TextStyle(color: AppColors.onSurfaceVariant),
+                    prefixIcon: Icon(Icons.email_outlined, size: 20),
+                  ),
+                  style: const TextStyle(color: AppColors.onSurface),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Please enter your email';
+                    }
+                    final emailRegex = RegExp(
+                      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                    );
+                    if (!emailRegex.hasMatch(value.trim())) {
+                      return 'Please enter a valid email';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _messageController,
+                  enabled: !isSending,
+                  maxLines: 4,
+                  decoration: const InputDecoration(
+                    labelText: 'Your Message',
+                    labelStyle: TextStyle(color: AppColors.onSurfaceVariant),
+                    alignLabelWithHint: true,
+                    prefixIcon: Padding(
+                      padding: EdgeInsets.only(bottom: 60),
+                      child: Icon(Icons.message_outlined, size: 20),
+                    ),
+                  ),
+                  style: const TextStyle(color: AppColors.onSurface),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Please enter your message';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 24),
+                isSending
+                    ? const Center(
+                        child: CircularProgressIndicator(
+                          color: AppColors.primary,
+                        ),
+                      )
+                    : GradientButton(
+                        text: 'Send Message',
+                        icon: Icons.send_rounded,
+                        onPressed: _onSend,
+                      ),
+              ],
             ),
-            style: TextStyle(color: AppColors.onSurface),
           ),
-          const SizedBox(height: 24),
-          GradientButton(
-            text: 'Send Message',
-            icon: Icons.send_rounded,
-            onPressed: () {},
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

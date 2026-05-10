@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/di/injection_container.dart' as di;
 import 'core/theme/app_theme.dart';
 import 'features/portfolio/presentation/cubit/about_cubit.dart';
+import 'features/portfolio/presentation/cubit/contact_cubit.dart';
 import 'features/portfolio/presentation/cubit/experience_cubit.dart';
 import 'features/portfolio/presentation/cubit/profile_cubit.dart';
 import 'features/portfolio/presentation/cubit/project_cubit.dart';
@@ -38,6 +39,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider<ProjectCubit>(
           create: (_) => di.sl<ProjectCubit>()..fetchProjects(),
+        ),
+        BlocProvider<ContactCubit>(
+          create: (_) => di.sl<ContactCubit>(),
         ),
       ],
       child: MaterialApp(
