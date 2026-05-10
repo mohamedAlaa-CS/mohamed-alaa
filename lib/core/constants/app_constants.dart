@@ -30,72 +30,11 @@ abstract final class AppConstants {
     (name: 'Payments', icon: Icons.payment_outlined, level: 0.7),
   ];
 
-  // ── Projects ───────────────────────────────────────────────────
-  static const List<ProjectData> projects = [
-    ProjectData(
-      title: 'Quran Khatma App',
-      description:
-          'A collaborative Quran reading app that allows users to create and '
-          'join khatmas, track progress, and compete in leaderboards. Built '
-          'with real-time sync and offline support.',
-      tags: ['Flutter', 'Firebase', 'Cubit', 'Offline'],
-      githubUrl: 'https://github.com/mohamedAlaa-CS',
-      color: Color(0xFF6C63FF),
-    ),
-    ProjectData(
-      title: 'Hotel Booking App',
-      description:
-          'A full-featured hotel booking app with room browsing, filtering, '
-          'booking management, payment integration via Stripe, and push '
-          'notifications for booking updates.',
-      tags: ['Flutter', 'REST API', 'Stripe', 'Clean Arch'],
-      githubUrl: 'https://github.com/mohamedAlaa-CS',
-      color: Color(0xFF00D9FF),
-    ),
-    ProjectData(
-      title: 'Real-time Chat App',
-      description:
-          'A messaging application with real-time chat using Pusher, media '
-          'sharing, typing indicators, read receipts, and group conversation '
-          'support.',
-      tags: ['Flutter', 'Pusher', 'Real-time', 'Firebase'],
-      githubUrl: 'https://github.com/mohamedAlaa-CS',
-      color: Color(0xFFDB761F),
-    ),
-    ProjectData(
-      title: 'E-Learning Platform',
-      description:
-          'An educational platform with video courses, quizzes, progress '
-          'tracking, certificate generation, and payment integration using '
-          'Paymob.',
-      tags: ['Flutter', 'Paymob', 'Video', 'Cubit'],
-      githubUrl: 'https://github.com/mohamedAlaa-CS',
-      color: Color(0xFFFFB785),
-    ),
-  ];
-
   // ── Layout ─────────────────────────────────────────────────────
   static const double maxContentWidth = 1200;
   static const double sectionSpacing = 80;
   static const double mobileBreakpoint = 600;
   static const double tabletBreakpoint = 900;
   static const double desktopBreakpoint = 1200;
-}
-
-/// Data model for a featured project.
-class ProjectData {
-  const ProjectData({
-    required this.title,
-    required this.description,
-    required this.tags,
-    required this.githubUrl,
-    required this.color,
-  });
-
-  final String title;
-  final String description;
-  final List<String> tags;
-  final String githubUrl;
-  final Color color;
 }
 

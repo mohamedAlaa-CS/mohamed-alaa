@@ -13,9 +13,8 @@ class SkillsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
     final isDesktop = width >= AppConstants.tabletBreakpoint;
-    final crossCount = width >= AppConstants.desktopBreakpoint
-        ? 4
-        : (isDesktop ? 3 : 2);
+    final crossCount =
+        width >= AppConstants.desktopBreakpoint ? 4 : (isDesktop ? 3 : 2);
 
     return Container(
       constraints: const BoxConstraints(maxWidth: AppConstants.maxContentWidth),
@@ -34,7 +33,7 @@ class SkillsSection extends StatelessWidget {
               crossAxisCount: crossCount,
               mainAxisSpacing: 16,
               crossAxisSpacing: 16,
-              childAspectRatio: 1.1,
+              childAspectRatio: 1.3,
             ),
             itemCount: AppConstants.skills.length,
             itemBuilder: (context, index) {
@@ -77,26 +76,27 @@ class _SkillCardState extends State<_SkillCard> {
       onExit: (_) => setState(() => _isHovered = false),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
-        transform: Matrix4.identity()
-          ..translate(0.0, _isHovered ? -6.0 : 0.0),
+        transform: Matrix4.identity()..translate(0.0, _isHovered ? -6.0 : 0.0),
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: AppColors.cardBackground,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: _isHovered
-                ? AppColors.primaryPurple.withValues(alpha: 0.4)
-                : Colors.white.withValues(alpha: 0.06),
+            color:
+                _isHovered
+                    ? AppColors.primaryPurple.withValues(alpha: 0.4)
+                    : Colors.white.withValues(alpha: 0.06),
           ),
-          boxShadow: _isHovered
-              ? [
-                  BoxShadow(
-                    color: AppColors.primaryPurple.withValues(alpha: 0.15),
-                    blurRadius: 20,
-                    spreadRadius: -2,
-                  ),
-                ]
-              : [],
+          boxShadow:
+              _isHovered
+                  ? [
+                    BoxShadow(
+                      color: AppColors.primaryPurple.withValues(alpha: 0.15),
+                      blurRadius: 20,
+                      spreadRadius: -2,
+                    ),
+                  ]
+                  : [],
           gradient: AppColors.subtleCardGradient,
         ),
         child: Column(
@@ -106,9 +106,10 @@ class _SkillCardState extends State<_SkillCard> {
               duration: const Duration(milliseconds: 250),
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: _isHovered
-                    ? AppColors.primaryPurple.withValues(alpha: 0.15)
-                    : AppColors.primaryPurple.withValues(alpha: 0.08),
+                color:
+                    _isHovered
+                        ? AppColors.primaryPurple.withValues(alpha: 0.15)
+                        : AppColors.primaryPurple.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(

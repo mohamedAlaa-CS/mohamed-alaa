@@ -7,6 +7,7 @@ import 'core/theme/app_theme.dart';
 import 'features/portfolio/presentation/cubit/about_cubit.dart';
 import 'features/portfolio/presentation/cubit/experience_cubit.dart';
 import 'features/portfolio/presentation/cubit/profile_cubit.dart';
+import 'features/portfolio/presentation/cubit/project_cubit.dart';
 import 'features/portfolio/presentation/screens/portfolio_screen.dart';
 
 void main() async {
@@ -34,6 +35,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider<ExperienceCubit>(
           create: (_) => di.sl<ExperienceCubit>()..fetchExperiences(),
+        ),
+        BlocProvider<ProjectCubit>(
+          create: (_) => di.sl<ProjectCubit>()..fetchProjects(),
         ),
       ],
       child: MaterialApp(
