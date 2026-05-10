@@ -74,38 +74,6 @@ abstract final class AppConstants {
     ),
   ];
 
-  // ── Experience ─────────────────────────────────────────────────
-  static const List<ExperienceData> experiences = [
-    ExperienceData(
-      role: 'Flutter Developer',
-      company: 'Freelance',
-      period: '2024 – Present',
-      description:
-          'Building production-grade Flutter apps for clients. Implementing '
-          'clean architecture, state management with Cubit/BLoC, Firebase '
-          'integration, REST APIs, and payment systems.',
-      highlights: [
-        'Delivered 10+ mobile applications',
-        'Implemented Stripe & Paymob payment systems',
-        'Built real-time features with Pusher',
-      ],
-    ),
-    ExperienceData(
-      role: 'Mobile App Developer',
-      company: 'Self-Employed',
-      period: '2023 – 2024',
-      description:
-          'Developed personal projects and contributed to open-source Flutter '
-          'packages. Focused on learning advanced architecture patterns and '
-          'performance optimization.',
-      highlights: [
-        'Mastered Clean Architecture patterns',
-        'Built offline-first applications',
-        'Integrated Firebase Auth, Firestore, and FCM',
-      ],
-    ),
-  ];
-
   // ── Layout ─────────────────────────────────────────────────────
   static const double maxContentWidth = 1200;
   static const double sectionSpacing = 80;
@@ -131,19 +99,3 @@ class ProjectData {
   final Color color;
 }
 
-/// Data model for a timeline experience entry.
-class ExperienceData {
-  const ExperienceData({
-    required this.role,
-    required this.company,
-    required this.period,
-    required this.description,
-    required this.highlights,
-  });
-
-  final String role;
-  final String company;
-  final String period;
-  final String description;
-  final List<String> highlights;
-}
