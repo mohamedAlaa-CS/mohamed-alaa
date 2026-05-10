@@ -92,7 +92,7 @@ class _ProjectsContent extends StatelessWidget {
               crossAxisCount: isDesktop ? 2 : 1,
               mainAxisSpacing: 24,
               crossAxisSpacing: 24,
-              childAspectRatio: isDesktop ? 1.6 : 1.7,
+              childAspectRatio: isDesktop ? 1.6 : 1.5,
             ),
             itemCount: projects.length,
             itemBuilder: (context, index) {
