@@ -96,18 +96,18 @@ class _SkillCardState extends State<_SkillCard> {
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: _isHovered
-                ? AppColors.primaryPurple.withValues(alpha: 0.4)
-                : Colors.white.withValues(alpha: 0.06),
+                ? AppColors.caramel.withValues(alpha: 0.5)
+                : AppColors.outline,
           ),
-          boxShadow: _isHovered
-              ? [
-                  BoxShadow(
-                    color: AppColors.primaryPurple.withValues(alpha: 0.15),
-                    blurRadius: 20,
-                    spreadRadius: -2,
-                  ),
-                ]
-              : [],
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.shadow.withValues(
+                alpha: _isHovered ? 0.08 : 0.03,
+              ),
+              blurRadius: _isHovered ? 20 : 10,
+              offset: Offset(0, _isHovered ? 6 : 2),
+            ),
+          ],
           gradient: AppColors.subtleCardGradient,
         ),
         child: Column(
@@ -145,7 +145,7 @@ class _SkillCardState extends State<_SkillCard> {
               child: LinearProgressIndicator(
                 value: widget.level,
                 minHeight: 4,
-                backgroundColor: Colors.white.withValues(alpha: 0.06),
+                backgroundColor: AppColors.outlineVariant,
                 valueColor: AlwaysStoppedAnimation<Color>(
                   _isHovered ? AppColors.primaryCyan : AppColors.primaryPurple,
                 ),

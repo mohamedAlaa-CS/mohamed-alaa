@@ -162,18 +162,18 @@ class _ProjectCardState extends State<_ProjectCard> {
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: _isHovered
-                ? accent.withValues(alpha: 0.4)
-                : Colors.white.withValues(alpha: 0.06),
+                ? accent.withValues(alpha: 0.5)
+                : AppColors.outline,
           ),
-          boxShadow: _isHovered
-              ? [
-                  BoxShadow(
-                    color: accent.withValues(alpha: 0.15),
-                    blurRadius: 25,
-                    spreadRadius: -3,
-                  ),
-                ]
-              : [],
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.shadow.withValues(
+                alpha: _isHovered ? 0.08 : 0.04,
+              ),
+              blurRadius: _isHovered ? 24 : 12,
+              offset: Offset(0, _isHovered ? 8 : 3),
+            ),
+          ],
         ),
         // Column sizes to content — no Expanded needed
         child: Column(
@@ -263,7 +263,7 @@ class _ProjectCardState extends State<_ProjectCard> {
             const SizedBox(height: 16),
             // Divider
             Divider(
-              color: Colors.white.withValues(alpha: 0.06),
+              color: AppColors.outlineVariant,
               height: 1,
             ),
             const SizedBox(height: 12),

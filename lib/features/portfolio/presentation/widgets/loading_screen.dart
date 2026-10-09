@@ -157,7 +157,7 @@ class _AmbientGlows extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        // Top-left purple glow
+        // Top-left caramel glow
         Positioned(
           top: -200,
           left: -200,
@@ -168,14 +168,14 @@ class _AmbientGlows extends StatelessWidget {
               shape: BoxShape.circle,
               gradient: RadialGradient(
                 colors: [
-                  AppColors.primaryPurple.withValues(alpha: 0.12),
-                  AppColors.primaryPurple.withValues(alpha: 0.0),
+                  AppColors.caramel.withValues(alpha: 0.08),
+                  AppColors.caramel.withValues(alpha: 0.0),
                 ],
               ),
             ),
           ),
         ),
-        // Bottom-right cyan glow
+        // Bottom-right warm sand glow
         Positioned(
           bottom: -200,
           right: -200,
@@ -186,8 +186,8 @@ class _AmbientGlows extends StatelessWidget {
               shape: BoxShape.circle,
               gradient: RadialGradient(
                 colors: [
-                  AppColors.primaryCyan.withValues(alpha: 0.08),
-                  AppColors.primaryCyan.withValues(alpha: 0.0),
+                  AppColors.sand.withValues(alpha: 0.25),
+                  AppColors.sand.withValues(alpha: 0.0),
                 ],
               ),
             ),
@@ -202,8 +202,8 @@ class _AmbientGlows extends StatelessWidget {
               shape: BoxShape.circle,
               gradient: RadialGradient(
                 colors: [
-                  AppColors.primaryPurple.withValues(alpha: 0.04),
-                  AppColors.primaryPurple.withValues(alpha: 0.0),
+                  AppColors.caramel.withValues(alpha: 0.03),
+                  AppColors.caramel.withValues(alpha: 0.0),
                 ],
               ),
             ),
@@ -240,13 +240,13 @@ class _PulsingLogoRing extends StatelessWidget {
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primaryPurple.withValues(alpha: glowOpacity),
+                  color: AppColors.caramel.withValues(alpha: glowOpacity * 0.5),
                   blurRadius: 40,
                   spreadRadius: 8,
                 ),
                 BoxShadow(
-                  color: AppColors.primaryCyan.withValues(
-                    alpha: glowOpacity * 0.6,
+                  color: AppColors.espresso.withValues(
+                    alpha: glowOpacity * 0.3,
                   ),
                   blurRadius: 60,
                   spreadRadius: 4,
@@ -258,11 +258,11 @@ class _PulsingLogoRing extends StatelessWidget {
                 shape: BoxShape.circle,
                 gradient: SweepGradient(
                   colors: [
-                    AppColors.primaryPurple,
-                    AppColors.primaryCyan,
-                    AppColors.primaryPurple.withValues(alpha: 0.3),
-                    AppColors.primaryCyan,
-                    AppColors.primaryPurple,
+                    AppColors.espresso,
+                    AppColors.caramel,
+                    AppColors.espresso.withValues(alpha: 0.3),
+                    AppColors.caramel,
+                    AppColors.espresso,
                   ],
                   stops: const [0.0, 0.25, 0.5, 0.75, 1.0],
                 ),
@@ -320,8 +320,8 @@ class _ShimmerText extends StatelessWidget {
             return LinearGradient(
               colors: const [
                 AppColors.onSurface,
-                AppColors.primaryCyan,
-                AppColors.primaryPurple,
+                AppColors.caramel,
+                AppColors.caramelLight,
                 AppColors.onSurface,
               ],
               stops: [
@@ -400,8 +400,8 @@ class _ProgressBarPainter extends CustomPainter {
     final gradientPaint = Paint()
       ..shader = const LinearGradient(
         colors: [
-          AppColors.primaryPurple,
-          AppColors.primaryCyan,
+          AppColors.espresso,
+          AppColors.caramel,
         ],
       ).createShader(
         Rect.fromLTWH(indicatorStart, 0, indicatorWidth, size.height),
@@ -497,9 +497,9 @@ class _ParticlePainter extends CustomPainter {
 
       final paint = Paint()
         ..color = (particle.isPurple
-                ? AppColors.primaryPurple
-                : AppColors.primaryCyan)
-            .withValues(alpha: particle.opacity)
+                ? AppColors.caramel
+                : AppColors.sand)
+            .withValues(alpha: particle.opacity * 0.8)
         ..style = PaintingStyle.fill;
 
       canvas.drawCircle(Offset(x, y), particle.size, paint);

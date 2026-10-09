@@ -164,16 +164,16 @@ class _HeroContent extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
-            color: AppColors.primaryPurple.withValues(alpha: 0.1),
+            color: AppColors.caramel.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(100),
             border: Border.all(
-              color: AppColors.primaryPurple.withValues(alpha: 0.2),
+              color: AppColors.caramel.withValues(alpha: 0.25),
             ),
           ),
           child: Text(
             '👋 Welcome to my portfolio',
             style: AppTextStyles.labelLarge.copyWith(
-              color: AppColors.primary,
+              color: AppColors.caramel,
               fontSize: _isMobile ? 12 : 14,
             ),
           ),

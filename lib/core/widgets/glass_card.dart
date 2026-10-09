@@ -2,8 +2,10 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-/// Glassmorphism card with backdrop blur, semi-transparent fill,
-/// and luminescent 1px border.
+import '../theme/app_colors.dart';
+
+/// Frosted card with backdrop blur, semi-transparent fill,
+/// and refined border matching the editorial design system.
 class GlassCard extends StatelessWidget {
   const GlassCard({
     super.key,
@@ -11,9 +13,10 @@ class GlassCard extends StatelessWidget {
     this.padding = const EdgeInsets.all(24),
     this.borderRadius = 12,
     this.blurAmount = 20,
-    this.opacity = 0.08,
-    this.borderOpacity = 0.12,
+    this.opacity = 0.75,
+    this.borderOpacity = 1.0,
     this.borderColor,
+    this.color,
   });
 
   final Widget child;
@@ -23,6 +26,7 @@ class GlassCard extends StatelessWidget {
   final double opacity;
   final double borderOpacity;
   final Color? borderColor;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -36,12 +40,18 @@ class GlassCard extends StatelessWidget {
         child: Container(
           padding: padding,
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: opacity),
+            color: (color ?? Colors.white).withValues(alpha: opacity),
             borderRadius: BorderRadius.circular(borderRadius),
             border: Border.all(
-              color: (borderColor ?? Colors.white)
-                  .withValues(alpha: borderOpacity),
+              color: borderColor ?? AppColors.outline,
             ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.shadow.withValues(alpha: 0.05),
+                blurRadius: 16,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
           child: child,
         ),

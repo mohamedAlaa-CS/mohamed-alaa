@@ -3,14 +3,14 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'app_colors.dart';
 
-/// App-wide dark theme derived from the Stitch design system.
+/// App-wide theme derived from the Editorial Light design system.
 abstract final class AppTheme {
-  static ThemeData get darkTheme {
+  static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
-      brightness: Brightness.dark,
+      brightness: Brightness.light,
       scaffoldBackgroundColor: AppColors.background,
-      colorScheme: const ColorScheme.dark(
+      colorScheme: const ColorScheme.light(
         primary: AppColors.primary,
         onPrimary: AppColors.onPrimary,
         primaryContainer: AppColors.primaryContainer,
@@ -40,7 +40,7 @@ abstract final class AppTheme {
         shadow: AppColors.shadow,
       ),
       textTheme: GoogleFonts.interTextTheme(
-        ThemeData.dark().textTheme,
+        ThemeData.light().textTheme,
       ),
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.transparent,
@@ -49,23 +49,23 @@ abstract final class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.background,
+        fillColor: AppColors.surface,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(
-            color: Colors.white.withValues(alpha: 0.1),
+          borderSide: const BorderSide(
+            color: AppColors.outline,
           ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(
-            color: Colors.white.withValues(alpha: 0.1),
+          borderSide: const BorderSide(
+            color: AppColors.outline,
           ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: const BorderSide(
-            color: AppColors.primaryCyan,
+            color: AppColors.espresso,
             width: 1.5,
           ),
         ),
@@ -76,4 +76,7 @@ abstract final class AppTheme {
       ),
     );
   }
+
+  /// Compatibility alias to support existing references
+  static ThemeData get darkTheme => lightTheme;
 }

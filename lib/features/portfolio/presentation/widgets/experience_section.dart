@@ -204,9 +204,18 @@ class _TimelineEntryState extends State<_TimelineEntry> {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: _isHovered
-                        ? AppColors.primaryPurple.withValues(alpha: 0.3)
-                        : Colors.white.withValues(alpha: 0.06),
+                        ? AppColors.caramel.withValues(alpha: 0.5)
+                        : AppColors.outline,
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.shadow.withValues(
+                        alpha: _isHovered ? 0.08 : 0.03,
+                      ),
+                      blurRadius: _isHovered ? 20 : 10,
+                      offset: Offset(0, _isHovered ? 6 : 2),
+                    ),
+                  ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

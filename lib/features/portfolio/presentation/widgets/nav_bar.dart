@@ -33,7 +33,7 @@ class NavBar extends StatelessWidget {
         border: Border(
           bottom: BorderSide(
             color: scrollOffset > 50
-                ? Colors.white.withValues(alpha: 0.05)
+                ? AppColors.outline
                 : Colors.transparent,
           ),
         ),

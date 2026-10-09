@@ -319,7 +319,7 @@ class _BackgroundDecoration extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        // Purple glow top-left
+        // Caramel glow top-left
         Positioned(
           top: -100,
           left: -100,
@@ -330,14 +330,14 @@ class _BackgroundDecoration extends StatelessWidget {
               shape: BoxShape.circle,
               gradient: RadialGradient(
                 colors: [
-                  AppColors.primaryPurple.withValues(alpha: 0.08),
-                  AppColors.primaryPurple.withValues(alpha: 0.0),
+                  AppColors.caramel.withValues(alpha: 0.05),
+                  AppColors.caramel.withValues(alpha: 0.0),
                 ],
               ),
             ),
           ),
         ),
-        // Cyan glow bottom-right
+        // Warm sand subtle glow bottom-right
         Positioned(
           top: 400,
           right: -150,
@@ -348,8 +348,8 @@ class _BackgroundDecoration extends StatelessWidget {
               shape: BoxShape.circle,
               gradient: RadialGradient(
                 colors: [
-                  AppColors.primaryCyan.withValues(alpha: 0.05),
-                  AppColors.primaryCyan.withValues(alpha: 0.0),
+                  AppColors.sand.withValues(alpha: 0.35),
+                  AppColors.sand.withValues(alpha: 0.0),
                 ],
               ),
             ),
@@ -367,7 +367,7 @@ class _DotGridPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final paint =
         Paint()
-          ..color = Colors.white.withValues(alpha: 0.03)
+          ..color = AppColors.espresso.withValues(alpha: 0.035)
           ..style = PaintingStyle.fill;
 
     const spacing = 40.0;

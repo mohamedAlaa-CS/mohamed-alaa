@@ -28,7 +28,7 @@ class FooterSection extends StatelessWidget {
         color: AppColors.surfaceContainerLowest,
         border: Border(
           top: BorderSide(
-            color: Colors.white.withValues(alpha: 0.06),
+            color: AppColors.outlineVariant,
           ),
         ),
       ),
@@ -60,7 +60,7 @@ class FooterSection extends StatelessWidget {
           const SizedBox(height: 24),
           Container(
             height: 1,
-            color: Colors.white.withValues(alpha: 0.06),
+            color: AppColors.outlineVariant,
           ),
           const SizedBox(height: 20),
           Text(
@@ -180,13 +180,13 @@ class _SocialButtonState extends State<_SocialButton> {
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: _isHovered
-                ? AppColors.primaryPurple.withValues(alpha: 0.15)
-                : Colors.white.withValues(alpha: 0.05),
+                ? AppColors.primaryContainer
+                : AppColors.surface,
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
               color: _isHovered
-                  ? AppColors.primaryPurple.withValues(alpha: 0.3)
-                  : Colors.white.withValues(alpha: 0.08),
+                  ? AppColors.caramel.withValues(alpha: 0.5)
+                  : AppColors.outline,
             ),
           ),
           child: Icon(
