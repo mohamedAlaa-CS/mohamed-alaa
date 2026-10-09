@@ -17,7 +17,6 @@ class ProfileRepositoryImpl implements ProfileRepository {
   Future<Profile> getProfile() async {
     try {
       final response = await _client.from('profiles').select().maybeSingle();
-      log(response.toString(),name: 'profile');
       if (response == null) {
         throw Exception('Profile not found');
       }
