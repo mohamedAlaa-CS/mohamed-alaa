@@ -14,6 +14,7 @@ import '../widgets/contact_section.dart';
 import '../widgets/experience_section.dart';
 import '../widgets/footer_section.dart';
 import '../widgets/hero_section.dart';
+import '../widgets/loading_screen.dart';
 import '../widgets/nav_bar.dart';
 import '../widgets/projects_section.dart';
 import '../widgets/skills_section.dart';
@@ -64,20 +65,28 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   Widget build(BuildContext context) {
     return BlocBuilder<ProfileCubit, ProfileState>(
       builder: (context, state) {
-        return switch (state) {
-          ProfileLoading() || ProfileInitial() => const _LoadingView(),
-          ProfileError(:final message) => _ErrorView(
-            message: message,
-            onRetry: () => context.read<ProfileCubit>().fetchProfile(),
-          ),
-          ProfileLoaded(:final profile) => _PortfolioContent(
-            profile: profile,
-            scrollController: _scrollController,
-            scrollOffset: _scrollOffset,
-            sectionKeys: _sectionKeys,
-            onScrollToSection: _scrollToSection,
-          ),
-        };
+        return AnimatedSwitcher(
+          duration: const Duration(milliseconds: 600),
+          switchInCurve: Curves.easeOut,
+          switchOutCurve: Curves.easeIn,
+          child: switch (state) {
+            ProfileLoading() ||
+            ProfileInitial() => const LoadingScreen(key: ValueKey('loading')),
+            ProfileError(:final message) => _ErrorView(
+              key: const ValueKey('error'),
+              message: message,
+              onRetry: () => context.read<ProfileCubit>().fetchProfile(),
+            ),
+            ProfileLoaded(:final profile) => _PortfolioContent(
+              key: const ValueKey('content'),
+              profile: profile,
+              scrollController: _scrollController,
+              scrollOffset: _scrollOffset,
+              sectionKeys: _sectionKeys,
+              onScrollToSection: _scrollToSection,
+            ),
+          },
+        );
       },
     );
   }
@@ -89,6 +98,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
 
 class _PortfolioContent extends StatefulWidget {
   const _PortfolioContent({
+    super.key,
     required this.profile,
     required this.scrollController,
     required this.scrollOffset,
@@ -232,23 +242,11 @@ class _PortfolioContentState extends State<_PortfolioContent> {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Loading / Error views
+// Error view
 // ─────────────────────────────────────────────────────────────────────────────
 
-class _LoadingView extends StatelessWidget {
-  const _LoadingView();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: AppColors.background,
-      body: Center(child: CircularProgressIndicator(color: AppColors.primary)),
-    );
-  }
-}
-
 class _ErrorView extends StatelessWidget {
-  const _ErrorView({required this.message, required this.onRetry});
+  const _ErrorView({super.key, required this.message, required this.onRetry});
 
   final String message;
   final VoidCallback onRetry;
