@@ -1,7 +1,6 @@
-import 'package:flutter/foundation.dart';
+import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:device_preview/device_preview.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/di/injection_container.dart' as di;
@@ -20,12 +19,7 @@ void main() async {
     anonKey: 'sb_publishable_WXCdvBXgxVd2J3J_DGIZpQ_OR3edHHi',
   );
   await di.init();
-  runApp(
-    DevicePreview(
-      enabled: false,
-      builder: (context) => const MyApp(),
-    ),
-  );
+  runApp(DevicePreview(enabled: false, builder: (context) => const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -39,17 +33,15 @@ class MyApp extends StatelessWidget {
           create: (_) => di.sl<ProfileCubit>()..fetchProfile(),
         ),
         BlocProvider<AboutCubit>(
-          create: (_) => di.sl<AboutCubit>()..fetchAboutInfo(),
+          create: (_) => di.sl<AboutCubit>(),
         ),
         BlocProvider<ExperienceCubit>(
-          create: (_) => di.sl<ExperienceCubit>()..fetchExperiences(),
+          create: (_) => di.sl<ExperienceCubit>(),
         ),
         BlocProvider<ProjectCubit>(
-          create: (_) => di.sl<ProjectCubit>()..fetchProjects(),
+          create: (_) => di.sl<ProjectCubit>(),
         ),
-        BlocProvider<ContactCubit>(
-          create: (_) => di.sl<ContactCubit>(),
-        ),
+        BlocProvider<ContactCubit>(create: (_) => di.sl<ContactCubit>()),
       ],
       child: MaterialApp(
         title: 'Mohamed Alaa - Flutter Developer',
@@ -62,4 +54,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-

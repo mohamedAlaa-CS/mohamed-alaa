@@ -4,8 +4,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../domain/entities/profile.dart';
+import '../cubit/about_cubit.dart';
+import '../cubit/experience_cubit.dart';
 import '../cubit/profile_cubit.dart';
 import '../cubit/profile_state.dart';
+import '../cubit/project_cubit.dart';
 import '../widgets/about_section.dart';
 import '../widgets/contact_section.dart';
 import '../widgets/experience_section.dart';
@@ -84,7 +87,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
 // Full portfolio layout (shown when profile is loaded)
 // ─────────────────────────────────────────────────────────────────────────────
 
-class _PortfolioContent extends StatelessWidget {
+class _PortfolioContent extends StatefulWidget {
   const _PortfolioContent({
     required this.profile,
     required this.scrollController,
@@ -100,6 +103,32 @@ class _PortfolioContent extends StatelessWidget {
   final void Function(int) onScrollToSection;
 
   @override
+  State<_PortfolioContent> createState() => _PortfolioContentState();
+}
+
+class _PortfolioContentState extends State<_PortfolioContent> {
+  @override
+  void initState() {
+    super.initState();
+    _fetchDataStaggered();
+  }
+
+  void _fetchDataStaggered() async {
+    // Stagger API calls to avoid UI lag and concurrent request bottleneck
+    await Future.delayed(const Duration(milliseconds: 300));
+    if (!mounted) return;
+    context.read<AboutCubit>().fetchAboutInfo();
+
+    await Future.delayed(const Duration(milliseconds: 300));
+    if (!mounted) return;
+    context.read<ProjectCubit>().fetchProjects();
+
+    await Future.delayed(const Duration(milliseconds: 300));
+    if (!mounted) return;
+    context.read<ExperienceCubit>().fetchExperiences();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -109,7 +138,7 @@ class _PortfolioContent extends StatelessWidget {
           const _BackgroundDecoration(),
           // Scrollable content
           CustomScrollView(
-            controller: scrollController,
+            controller: widget.scrollController,
             slivers: [
               // Top padding for navbar
               const SliverToBoxAdapter(child: SizedBox(height: 72)),
@@ -117,45 +146,45 @@ class _PortfolioContent extends StatelessWidget {
               SliverToBoxAdapter(
                 child: Center(
                   child: HeroSection(
-                    profile: profile,
-                    onViewProjects: () => onScrollToSection(2),
-                    onContactMe: () => onScrollToSection(4),
+                    profile: widget.profile,
+                    onViewProjects: () => widget.onScrollToSection(2),
+                    onContactMe: () => widget.onScrollToSection(4),
                   ),
                 ),
               ),
               // About
               SliverToBoxAdapter(
                 child: _SectionWrapper(
-                  key: sectionKeys[0],
+                  key: widget.sectionKeys[0],
                   child: const AboutSection(),
                 ),
               ),
               // Skills
               SliverToBoxAdapter(
                 child: _SectionWrapper(
-                  key: sectionKeys[1],
+                  key: widget.sectionKeys[1],
                   child: const SkillsSection(),
                 ),
               ),
               // Projects
               SliverToBoxAdapter(
                 child: _SectionWrapper(
-                  key: sectionKeys[2],
+                  key: widget.sectionKeys[2],
                   child: const ProjectsSection(),
                 ),
               ),
               // Experience
               SliverToBoxAdapter(
                 child: _SectionWrapper(
-                  key: sectionKeys[3],
+                  key: widget.sectionKeys[3],
                   child: const ExperienceSection(),
                 ),
               ),
               // Contact
               SliverToBoxAdapter(
                 child: _SectionWrapper(
-                  key: sectionKeys[4],
-                  child: ContactSection(profile: profile),
+                  key: widget.sectionKeys[4],
+                  child: ContactSection(profile: widget.profile),
                 ),
               ),
               // Footer
@@ -163,8 +192,8 @@ class _PortfolioContent extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.only(top: 40),
                   child: FooterSection(
-                    profile: profile,
-                    onNavItemTap: onScrollToSection,
+                    profile: widget.profile,
+                    onNavItemTap: widget.onScrollToSection,
                   ),
                 ),
               ),
@@ -177,19 +206,19 @@ class _PortfolioContent extends StatelessWidget {
             right: 0,
             child: Center(
               child: NavBar(
-                onNavItemTap: onScrollToSection,
-                scrollOffset: scrollOffset,
+                onNavItemTap: widget.onScrollToSection,
+                scrollOffset: widget.scrollOffset,
               ),
             ),
           ),
           // Floating back-to-top button
-          if (scrollOffset > 400)
+          if (widget.scrollOffset > 400)
             Positioned(
               bottom: 32,
               right: 32,
               child: _BackToTopButton(
                 onTap:
-                    () => scrollController.animateTo(
+                    () => widget.scrollController.animateTo(
                       0,
                       duration: const Duration(milliseconds: 600),
                       curve: Curves.easeInOut,
