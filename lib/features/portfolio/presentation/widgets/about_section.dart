@@ -86,7 +86,7 @@ class _AboutContent extends StatelessWidget {
         children: [
           const SectionHeading(
             //          title: 'About Me',
-            title: 'About Me with a auto push ',
+            title: 'About Me test github action ',
             subtitle: 'Get to know me and my journey',
           ),
           SizedBox(height: isMobile ? 28 : 44),
