@@ -84,11 +84,7 @@ class _AboutContent extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: hPad),
       child: Column(
         children: [
-          const SectionHeading(
-            //          title: 'About Me',
-            title: 'About Me test github action ',
-            subtitle: 'Get to know me and my journey',
-          ),
+          const SectionHeading(title: 'About Me'),
           SizedBox(height: isMobile ? 28 : 44),
           if (_isDesktop)
             // Desktop: Side-by-side balanced composition
