@@ -46,8 +46,8 @@ class AboutSection extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   FilledButton.icon(
-                    onPressed: () =>
-                        context.read<AboutCubit>().fetchAboutInfo(),
+                    onPressed:
+                        () => context.read<AboutCubit>().fetchAboutInfo(),
                     icon: const Icon(Icons.refresh_rounded),
                     label: const Text('Retry'),
                   ),
@@ -85,7 +85,8 @@ class _AboutContent extends StatelessWidget {
       child: Column(
         children: [
           const SectionHeading(
-            title: 'About Me',
+            //          title: 'About Me',
+            title: 'About Me with a auto push ',
             subtitle: 'Get to know me and my journey',
           ),
           SizedBox(height: isMobile ? 28 : 44),
@@ -96,18 +97,12 @@ class _AboutContent extends StatelessWidget {
               children: [
                 Expanded(
                   flex: 5,
-                  child: _AboutText(
-                    aboutInfo: aboutInfo,
-                    isMobile: false,
-                  ),
+                  child: _AboutText(aboutInfo: aboutInfo, isMobile: false),
                 ),
                 const SizedBox(width: 32),
                 Expanded(
                   flex: 4,
-                  child: _StatsGrid(
-                    aboutInfo: aboutInfo,
-                    isMobile: false,
-                  ),
+                  child: _StatsGrid(aboutInfo: aboutInfo, isMobile: false),
                 ),
               ],
             )
@@ -118,18 +113,12 @@ class _AboutContent extends StatelessWidget {
               children: [
                 Expanded(
                   flex: 5,
-                  child: _AboutText(
-                    aboutInfo: aboutInfo,
-                    isMobile: false,
-                  ),
+                  child: _AboutText(aboutInfo: aboutInfo, isMobile: false),
                 ),
                 const SizedBox(width: 24),
                 Expanded(
                   flex: 4,
-                  child: _StatsGrid(
-                    aboutInfo: aboutInfo,
-                    isMobile: false,
-                  ),
+                  child: _StatsGrid(aboutInfo: aboutInfo, isMobile: false),
                 ),
               ],
             )
@@ -137,15 +126,9 @@ class _AboutContent extends StatelessWidget {
             // Mobile: Stacked gracefully
             Column(
               children: [
-                _AboutText(
-                  aboutInfo: aboutInfo,
-                  isMobile: true,
-                ),
+                _AboutText(aboutInfo: aboutInfo, isMobile: true),
                 const SizedBox(height: 20),
-                _StatsGrid(
-                  aboutInfo: aboutInfo,
-                  isMobile: true,
-                ),
+                _StatsGrid(aboutInfo: aboutInfo, isMobile: true),
               ],
             ),
         ],
@@ -155,10 +138,7 @@ class _AboutContent extends StatelessWidget {
 }
 
 class _AboutText extends StatefulWidget {
-  const _AboutText({
-    required this.aboutInfo,
-    required this.isMobile,
-  });
+  const _AboutText({required this.aboutInfo, required this.isMobile});
 
   final AboutInfo aboutInfo;
   final bool isMobile;
@@ -322,44 +302,45 @@ class _AboutTextState extends State<_AboutText> {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: widget.aboutInfo.technologies.map((tech) {
-              return Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 11,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.warmBeige.withValues(alpha: 0.55),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: AppColors.outlineVariant,
-                    width: 0.8,
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 5,
-                      height: 5,
-                      decoration: const BoxDecoration(
-                        color: AppColors.caramel,
-                        shape: BoxShape.circle,
+            children:
+                widget.aboutInfo.technologies.map((tech) {
+                  return Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 11,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.warmBeige.withValues(alpha: 0.55),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: AppColors.outlineVariant,
+                        width: 0.8,
                       ),
                     ),
-                    const SizedBox(width: 7),
-                    Text(
-                      tech,
-                      style: GoogleFonts.inter(
-                        fontSize: 11.5,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.espresso,
-                      ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 5,
+                          height: 5,
+                          decoration: const BoxDecoration(
+                            color: AppColors.caramel,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 7),
+                        Text(
+                          tech,
+                          style: GoogleFonts.inter(
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.espresso,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              );
-            }).toList(),
+                  );
+                }).toList(),
           ),
         ],
       ),
@@ -368,10 +349,7 @@ class _AboutTextState extends State<_AboutText> {
 }
 
 class _StatsGrid extends StatefulWidget {
-  const _StatsGrid({
-    required this.aboutInfo,
-    required this.isMobile,
-  });
+  const _StatsGrid({required this.aboutInfo, required this.isMobile});
 
   final AboutInfo aboutInfo;
   final bool isMobile;
@@ -405,10 +383,13 @@ class _StatsGridState extends State<_StatsGrid> {
   void _checkVisibility() {
     if (_isVisible || !mounted) return;
     final renderObject = context.findRenderObject();
-    if (renderObject is RenderBox && renderObject.hasSize && renderObject.attached) {
+    if (renderObject is RenderBox &&
+        renderObject.hasSize &&
+        renderObject.attached) {
       final position = renderObject.localToGlobal(Offset.zero);
       final screenHeight = MediaQuery.sizeOf(context).height;
-      if (position.dy < screenHeight - 30 && position.dy + renderObject.size.height > 0) {
+      if (position.dy < screenHeight - 30 &&
+          position.dy + renderObject.size.height > 0) {
         _scrollPosition?.removeListener(_checkVisibility);
         _scrollPosition = null;
         setState(() => _isVisible = true);
@@ -455,19 +436,20 @@ class _StatsGridState extends State<_StatsGrid> {
         return Wrap(
           spacing: gap,
           runSpacing: gap,
-          children: stats.map((s) {
-            return SizedBox(
-              width: cardWidth,
-              child: _StatCard(
-                count: s.count,
-                suffix: s.suffix,
-                label: s.label,
-                icon: s.icon,
-                isMobile: widget.isMobile,
-                isVisible: _isVisible,
-              ),
-            );
-          }).toList(),
+          children:
+              stats.map((s) {
+                return SizedBox(
+                  width: cardWidth,
+                  child: _StatCard(
+                    count: s.count,
+                    suffix: s.suffix,
+                    label: s.label,
+                    icon: s.icon,
+                    isMobile: widget.isMobile,
+                    isVisible: _isVisible,
+                  ),
+                );
+              }).toList(),
         );
       },
     );
@@ -514,35 +496,32 @@ class _StatCardState extends State<_StatCard> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 220),
           curve: Curves.easeOutCubic,
-          transform: Matrix4.identity()
-            ..translate(0.0, _isHovered ? -3.0 : 0.0),
+          transform:
+              Matrix4.identity()..translate(0.0, _isHovered ? -3.0 : 0.0),
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(14),
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: _isHovered
-                  ? [
-                      Colors.white,
-                      const Color(0xFFFFF9F0),
-                    ]
-                  : [
-                      Colors.white,
-                      const Color(0xFFFAF7F2),
-                    ],
+              colors:
+                  _isHovered
+                      ? [Colors.white, const Color(0xFFFFF9F0)]
+                      : [Colors.white, const Color(0xFFFAF7F2)],
             ),
             border: Border.all(
-              color: _isHovered
-                  ? AppColors.caramel.withValues(alpha: 0.6)
-                  : AppColors.outline.withValues(alpha: 0.55),
+              color:
+                  _isHovered
+                      ? AppColors.caramel.withValues(alpha: 0.6)
+                      : AppColors.outline.withValues(alpha: 0.55),
               width: _isHovered ? 1.2 : 1.0,
             ),
             boxShadow: [
               BoxShadow(
-                color: _isHovered
-                    ? AppColors.caramel.withValues(alpha: 0.12)
-                    : AppColors.shadow.withValues(alpha: 0.03),
+                color:
+                    _isHovered
+                        ? AppColors.caramel.withValues(alpha: 0.12)
+                        : AppColors.shadow.withValues(alpha: 0.03),
                 blurRadius: _isHovered ? 14 : 5,
                 offset: Offset(0, _isHovered ? 4 : 2),
               ),
@@ -594,21 +573,30 @@ class _StatCardState extends State<_StatCard> {
                           width: iconBoxSize,
                           height: iconBoxSize,
                           decoration: BoxDecoration(
-                            color: _isHovered
-                                ? AppColors.caramel.withValues(alpha: 0.14)
-                                : AppColors.surfaceContainerLow,
+                            color:
+                                _isHovered
+                                    ? AppColors.caramel.withValues(alpha: 0.14)
+                                    : AppColors.surfaceContainerLow,
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
-                              color: _isHovered
-                                  ? AppColors.caramel.withValues(alpha: 0.35)
-                                  : AppColors.outlineVariant,
+                              color:
+                                  _isHovered
+                                      ? AppColors.caramel.withValues(
+                                        alpha: 0.35,
+                                      )
+                                      : AppColors.outlineVariant,
                               width: 1,
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: _isHovered
-                                    ? AppColors.caramel.withValues(alpha: 0.12)
-                                    : AppColors.espresso.withValues(alpha: 0.03),
+                                color:
+                                    _isHovered
+                                        ? AppColors.caramel.withValues(
+                                          alpha: 0.12,
+                                        )
+                                        : AppColors.espresso.withValues(
+                                          alpha: 0.03,
+                                        ),
                                 blurRadius: _isHovered ? 6 : 2,
                                 offset: const Offset(0, 1),
                               ),
@@ -621,9 +609,10 @@ class _StatCardState extends State<_StatCard> {
                               curve: Curves.easeOutBack,
                               child: Icon(
                                 widget.icon,
-                                color: _isHovered
-                                    ? AppColors.caramel
-                                    : AppColors.espresso,
+                                color:
+                                    _isHovered
+                                        ? AppColors.caramel
+                                        : AppColors.espresso,
                                 size: iconSize,
                               ),
                             ),
@@ -633,17 +622,21 @@ class _StatCardState extends State<_StatCard> {
                           duration: const Duration(milliseconds: 220),
                           padding: const EdgeInsets.all(5),
                           decoration: BoxDecoration(
-                            color: _isHovered
-                                ? AppColors.caramel.withValues(alpha: 0.1)
-                                : Colors.transparent,
+                            color:
+                                _isHovered
+                                    ? AppColors.caramel.withValues(alpha: 0.1)
+                                    : Colors.transparent,
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Icon(
                             Icons.arrow_outward_rounded,
                             size: widget.isMobile ? 14 : 16,
-                            color: _isHovered
-                                ? AppColors.caramel
-                                : AppColors.textMuted.withValues(alpha: 0.45),
+                            color:
+                                _isHovered
+                                    ? AppColors.caramel
+                                    : AppColors.textMuted.withValues(
+                                      alpha: 0.45,
+                                    ),
                           ),
                         ),
                       ],
@@ -715,9 +708,10 @@ class _AnimatedCounterState extends State<_AnimatedCounter>
       vsync: this,
       duration: const Duration(milliseconds: 1000),
     );
-    _animation = IntTween(begin: 0, end: widget.count).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
-    );
+    _animation = IntTween(
+      begin: 0,
+      end: widget.count,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
     if (widget.isVisible) {
       _started = true;
       _controller.forward();
@@ -773,4 +767,3 @@ class _AnimatedCounterState extends State<_AnimatedCounter>
     );
   }
 }
-

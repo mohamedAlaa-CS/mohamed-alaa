@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../domain/entities/profile.dart';
