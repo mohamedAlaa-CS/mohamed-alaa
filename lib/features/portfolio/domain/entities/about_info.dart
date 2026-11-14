@@ -10,6 +10,7 @@ class AboutInfo {
     required this.projectsCount,
     required this.technologiesCount,
     required this.clientsCount,
+    this.cvUrl = '',
   });
 
   final String title;
@@ -20,4 +21,5 @@ class AboutInfo {
   final int projectsCount;
   final int technologiesCount;
   final int clientsCount;
+  final String cvUrl;
 }

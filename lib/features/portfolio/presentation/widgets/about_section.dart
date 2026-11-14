@@ -9,10 +9,15 @@ import '../../../../core/widgets/section_heading.dart';
 import '../../domain/entities/about_info.dart';
 import '../cubit/about_cubit.dart';
 import '../cubit/about_state.dart';
+import 'download_cv_button.dart';
+import 'view_cv_button.dart';
 
 /// About Me section with editorial bio card and interactive statistic cards.
 class AboutSection extends StatelessWidget {
-  const AboutSection({super.key});
+  const AboutSection({super.key, this.onDownloadCv, this.onViewCv});
+
+  final VoidCallback? onDownloadCv;
+  final VoidCallback? onViewCv;
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +63,8 @@ class AboutSection extends StatelessWidget {
           AboutLoaded(:final aboutInfo) => _AboutContent(
             aboutInfo: aboutInfo,
             screenWidth: width,
+            onDownloadCv: onDownloadCv,
+            onViewCv: onViewCv,
           ),
         };
       },
@@ -66,10 +73,17 @@ class AboutSection extends StatelessWidget {
 }
 
 class _AboutContent extends StatelessWidget {
-  const _AboutContent({required this.aboutInfo, required this.screenWidth});
+  const _AboutContent({
+    required this.aboutInfo,
+    required this.screenWidth,
+    this.onDownloadCv,
+    this.onViewCv,
+  });
 
   final AboutInfo aboutInfo;
   final double screenWidth;
+  final VoidCallback? onDownloadCv;
+  final VoidCallback? onViewCv;
 
   bool get _isDesktop => screenWidth >= AppConstants.desktopBreakpoint;
   bool get _isTablet => screenWidth >= AppConstants.tabletBreakpoint;
@@ -93,7 +107,12 @@ class _AboutContent extends StatelessWidget {
               children: [
                 Expanded(
                   flex: 5,
-                  child: _AboutText(aboutInfo: aboutInfo, isMobile: false),
+                  child: _AboutText(
+                    aboutInfo: aboutInfo,
+                    isMobile: false,
+                    onDownloadCv: onDownloadCv,
+                    onViewCv: onViewCv,
+                  ),
                 ),
                 const SizedBox(width: 32),
                 Expanded(
@@ -109,7 +128,12 @@ class _AboutContent extends StatelessWidget {
               children: [
                 Expanded(
                   flex: 5,
-                  child: _AboutText(aboutInfo: aboutInfo, isMobile: false),
+                  child: _AboutText(
+                    aboutInfo: aboutInfo,
+                    isMobile: false,
+                    onDownloadCv: onDownloadCv,
+                    onViewCv: onViewCv,
+                  ),
                 ),
                 const SizedBox(width: 24),
                 Expanded(
@@ -122,7 +146,12 @@ class _AboutContent extends StatelessWidget {
             // Mobile: Stacked gracefully
             Column(
               children: [
-                _AboutText(aboutInfo: aboutInfo, isMobile: true),
+                _AboutText(
+                  aboutInfo: aboutInfo,
+                  isMobile: true,
+                  onDownloadCv: onDownloadCv,
+                  onViewCv: onViewCv,
+                ),
                 const SizedBox(height: 20),
                 _StatsGrid(aboutInfo: aboutInfo, isMobile: true),
               ],
@@ -134,10 +163,17 @@ class _AboutContent extends StatelessWidget {
 }
 
 class _AboutText extends StatefulWidget {
-  const _AboutText({required this.aboutInfo, required this.isMobile});
+  const _AboutText({
+    required this.aboutInfo,
+    required this.isMobile,
+    this.onDownloadCv,
+    this.onViewCv,
+  });
 
   final AboutInfo aboutInfo;
   final bool isMobile;
+  final VoidCallback? onDownloadCv;
+  final VoidCallback? onViewCv;
 
   @override
   State<_AboutText> createState() => _AboutTextState();
@@ -337,6 +373,28 @@ class _AboutTextState extends State<_AboutText> {
                     ),
                   );
                 }).toList(),
+          ),
+          const SizedBox(height: 24),
+          const Divider(
+            color: AppColors.outlineVariant,
+            height: 1,
+            thickness: 0.8,
+          ),
+          const SizedBox(height: 20),
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              DownloadCvButton(
+                cvUrl: widget.aboutInfo.cvUrl,
+                onPressed: widget.onDownloadCv,
+              ),
+              ViewCvButton(
+                cvUrl: widget.aboutInfo.cvUrl,
+                onPressed: widget.onViewCv,
+              ),
+            ],
           ),
         ],
       ),
