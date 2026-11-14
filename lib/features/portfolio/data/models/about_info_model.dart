@@ -11,6 +11,7 @@ class AboutInfoModel extends AboutInfo {
     required super.projectsCount,
     required super.technologiesCount,
     required super.clientsCount,
+    super.cvUrl = '',
   });
 
   factory AboutInfoModel.fromJson(Map<String, dynamic> json) {
@@ -26,6 +27,7 @@ class AboutInfoModel extends AboutInfo {
       projectsCount: json['projects_count'] as int? ?? 0,
       technologiesCount: json['technologies_count'] as int? ?? 0,
       clientsCount: json['clients_count'] as int? ?? 0,
+      cvUrl: json['cv_url'] as String? ?? '',
     );
   }
 }

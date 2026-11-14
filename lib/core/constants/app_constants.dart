@@ -36,5 +36,9 @@ abstract final class AppConstants {
   static const double mobileBreakpoint = 600;
   static const double tabletBreakpoint = 900;
   static const double desktopBreakpoint = 1200;
+
+  // ── Documents & Links ──────────────────────────────────────────
+  static const String cvUrl =
+      'https://drive.google.com/file/d/1_example_cv/view?usp=sharing';
 }
 
